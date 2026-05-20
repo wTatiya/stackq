@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>แบบสำรวจทักษะการใช้โปรแกรม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        .slide-enter-right { animation: slideInRight 0.3s forwards; }
+        .slide-enter-left { animation: slideInLeft 0.3s forwards; }
+        .slide-exit-left { animation: slideOutLeft 0.3s forwards; }
+        .slide-exit-right { animation: slideOutRight 0.3s forwards; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const names = [
+            "กนกวลัย เครือวัลย์", "กิรณา หิรัญปภาภิรมย์", "จันทิรา แก่นจันทร์", "ณฐวรรณณี ณฎฐชัยยมงคล",
+            "ณตวัน สุรกิตติเดช", "ณัชชา ตันเทวี", "ณัฐกมล สนิทกูล", "ณัฐฐินันท์ วงค์สุนะ", "ณัฐิญาดา แก้วเกตุ",
+            "ดวงกมล เหล่าสาร", "ดาววดี ไชยรินทร์", "ทิพยวรรณ อ้วนชัย", "ธนวัฒน์ กระจายศรี", "ธัญชนก พงศ์โภชน์",
+            "ธันพิชา บัวชาติ", "นนท์หทัย ยอดแก้ว", "นพวรรณ บุญโต", "นฤมล ปันจัน", "น้ำฝน กำเหนิดทอง",
+            "นุชดา ดอนโมกข์", "ปวริศ ศิริธรรมหิสร", "ปิ่นอนงค์ ศรีวงษา", "พรจิรา อินทศิริ", "พรชนก ญะเมืองมอญ",
+            "พัชมณ วงศ์ทองดี", "พัชรีญา ศรีดี", "ภคมน รัตนยุวกร", "ภาวิณี อุเทศพรรัตนกุล", "มณีวรรณ จารุพันธ์",
+            "มัณฑนา สุวรรณศรี", "ยศวฎี เพิ่มชม", "วชิราพร เดชะปรากรม", "วนิดา วรอินทร์", "วรัมพร บูรณภวังค์",
+            "วิชยุตม์ ยุวะบุตร", "ศนิกานต์ ทรัพย์สะสม", "ศิวพร อู่อรุณ", "สุญาดา ลาภวรุตม์", "สุธิดา ปุจฉาการ",
+            "อนัญพร พูลเกษม", "อภิชญรัศมิ์ พงษ์เขมภัคค์", "อิติรัตน์ บุญมี", "อุณานุศร์ ศรีสมัยเจริญ"
+        ].sort((a, b) => a.localeCompare(b, 'th'));
+
+        const categories = [
+            {
+                id: 'docs',
+                title: 'เอกสารและพื้นที่จัดเก็บ (Documents & Storage)',
+                apps: [
+                    { id: 'gdoc', name: 'Google Doc', slug: 'googledocs' },
+                    { id: 'gsheet', name: 'Google Sheet', slug: 'googlesheets' },
+                    { id: 'gslide', name: 'Google Slide', slug: 'googleslides' },
+                    { id: 'gdrive', name: 'Google Drive', slug: 'googledrive' },
+                    { id: 'gforms', name: 'Google Forms', slug: 'googleforms' },
+                    { id: 'word', name: 'Microsoft Word', slug: 'microsoftword' },
+                    { id: 'excel', name: 'Microsoft Excel', slug: 'microsoftexcel' },
+                    { id: 'powerpoint', name: 'Microsoft PowerPoint', slug: 'microsoftpowerpoint' },
+                    { id: 'onedrive', name: 'OneDrive', slug: 'microsoftonedrive' },
+                    { id: 'mforms', name: 'Microsoft Forms', slug: 'microsoft' },
+                    { id: 'coda', name: 'Coda', slug: 'coda' }
+                ]
+            },
+            {
+                id: 'communication',
+                title: 'การสื่อสารและตารางเวลา (Communication & Scheduling)',
+                apps: [
+                    { id: 'gmeet', name: 'Google Meet', slug: 'googlemeet' },
+                    { id: 'gcalendar', name: 'Google Calendar', slug: 'googlecalendar' },
+                    { id: 'gcontacts', name: 'Google Contacts', slug: 'google' },
+                    { id: 'teams', name: 'Microsoft Teams', slug: 'microsoftteams' },
+                    { id: 'outlook', name: 'Microsoft Outlook', slug: 'microsoftoutlook' },
+                    { id: 'skype', name: 'Skype', slug: 'skype' },
+                    { id: 'people', name: 'Microsoft People', slug: 'microsoft' }
+                ]
+            },
+            {
+                id: 'tasks',
+                title: 'การจัดการงานและบันทึก (Tasks & Notes)',
+                apps: [
+                    { id: 'gtasks', name: 'Google Tasks', slug: 'google' },
+                    { id: 'notebooklm', name: 'NotebookLM', slug: 'google' },
+                    { id: 'todo', name: 'Microsoft To Do', slug: 'microsoft' },
+                    { id: 'onenote', name: 'OneNote', slug: 'microsoftonenote' },
+                    { id: 'obsidian', name: 'Obsidian', slug: 'obsidian' }
+                ]
+            },
+            {
+                id: 'ai',
+                title: 'ปัญญาประดิษฐ์ (AI Tools)',
+                apps: [
+                    { id: 'gemini', name: 'Gemini', slug: 'googlegemini' },
+                    { id: 'aistudio', name: 'Google AI Studio', slug: 'google' },
+                    { id: 'glabs', name: 'Google Labs', slug: 'google' },
+                    { id: 'chatgpt', name: 'ChatGPT', slug: 'openai' },
+                    { id: 'copilot', name: 'Microsoft Copilot', slug: 'microsoftcopilot' },
+                    { id: 'claude', name: 'Claude AI', slug: 'anthropic' },
+                    { id: 'perplexity', name: 'Perplexity AI', slug: 'perplexity' },
+                    { id: 'cursor', name: 'Cursor AI', slug: 'cursor' },
+                    { id: 'deepseek', name: 'Deepseek AI', slug: '' },
+                    { id: 'grok', name: 'Grok AI', slug: '' },
+                    { id: 'kimi', name: 'Kimi AI', slug: '' },
+                    { id: 'okara', name: 'Okara AI', slug: '' },
+                    { id: 'lovable', name: 'Lovable AI', slug: '' },
+                    { id: 'bolt', name: 'Bolt', slug: '' }
+                ]
+            },
+            {
+                id: 'design',
+                title: 'การออกแบบและวิเคราะห์ข้อมูล (Design & Analytics)',
+                apps: [
+                    { id: 'canva', name: 'Canva', slug: 'canva' },
+                    { id: 'figma', name: 'Figma', slug: 'figma' },
+                    { id: 'miro', name: 'Miro', slug: 'miro' },
+                    { id: 'powerbi', name: 'Power BI', slug: 'powerbi' },
+                    { id: 'looker', name: 'Google Looker Studio', slug: 'looker' },
+                    { id: 'ganalytics', name: 'Google Analytic', slug: 'googleanalytics' },
+                    { id: 'sway', name: 'Microsoft Sway', slug: 'microsoft' },
+                    { id: 'clipchamp', name: 'Clipchamp', slug: 'clipchamp' }
+                ]
+            },
+            {
+                id: 'builders',
+                title: 'สร้างเว็บไซต์และแอป (Web & App Builders)',
+                apps: [
+                    { id: 'gsite', name: 'Google Site', slug: 'google' },
+                    { id: 'wordpress', name: 'WordPress', slug: 'wordpress' },
+                    { id: 'wix', name: 'Wix', slug: 'wix' },
+                    { id: 'webflow', name: 'Webflow', slug: 'webflow' },
+                    { id: 'squarespace', name: 'SquareSpace', slug: 'squarespace' },
+                    { id: 'weebly', name: 'Weebly', slug: 'weebly' },
+                    { id: 'bubble', name: 'Bubble', slug: 'bubble' },
+                    { id: 'glide', name: 'Glide', slug: 'glide' },
+                    { id: 'carrd', name: 'Carrd', slug: 'carrd' },
+                    { id: 'universe', name: 'Universe', slug: '' }
+                ]
+            },
+            {
+                id: 'cloud_dev',
+                title: 'คลาวด์และนักพัฒนา (Cloud & Development)',
+                apps: [
+                    { id: 'gcloud', name: 'Google Cloud', slug: 'googlecloud' },
+                    { id: 'firebase', name: 'Firebase', slug: 'firebase' },
+                    { id: 'aws', name: 'Amazon AWS', slug: 'amazonaws' },
+                    { id: 'azure', name: 'Microsoft Azure', slug: 'microsoftazure' },
+                    { id: 'cloudflare', name: 'Cloudflare', slug: 'cloudflare' },
+                    { id: 'supabase', name: 'Supabase', slug: 'supabase' },
+                    { id: 'github', name: 'GitHub', slug: 'github' },
+                    { id: 'gitlab', name: 'GitLab', slug: 'gitlab' },
+                    { id: 'bitbucket', name: 'Bitbucket', slug: 'bitbucket' },
+                    { id: 'replit', name: 'Replit', slug: 'replit' },
+                    { id: 'codesandbox', name: 'CodeSandbox', slug: 'codesandbox' },
+                    { id: 'codepen', name: 'Codepen', slug: 'codepen' },
+                    { id: 'collab', name: 'Google Collab', slug: 'googlecolab' }
+                ]
+            },
+            {
+                id: 'others',
+                title: 'เครื่องมืออื่นๆ (Other Tools)',
+                apps: [
+                    { id: 'gpass', name: 'Google Password Manager', slug: 'google' },
+                    { id: 'gauth', name: 'Google Authenticator', slug: 'googleauthenticator' },
+                    { id: 'mauth', name: 'Microsoft Authenticator', slug: 'microsoftauthenticator' },
+                    { id: 'gfonts', name: 'Google Fonts', slug: 'googlefonts' },
+                    { id: 'producthunt', name: 'Product Hunt', slug: 'producthunt' },
+                    { id: 'unsplash', name: 'Unsplash', slug: 'unsplash' },
+                    { id: 'pexels', name: 'Pexels', slug: 'pexels' }
+                ]
+            }
+        ];
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3wiQullgXFwEF8W3py7YltXQYP9feoog2bUf7_TgUtkkKR6d3ncLFzJpnVAlrvDcR4w/exec';
+
+        const AppLogo = ({ slug, name }) => {
+            if (!slug) {
+                return (
+                    <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center text-gray-500 font-bold shadow-sm shrink-0">
+                        {name.charAt(0).toUpperCase()}
+                    </div>
+                );
+            }
+            return (
+                <div className="relative w-10 h-10 shrink-0">
+                    <img 
+                        src={`https://cdn.simpleicons.org/${slug}`}
+                        alt={name}
+                        className="w-10 h-10 object-contain"
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                        }}
+                    />
+                    <div className="hidden w-10 h-10 rounded-xl bg-gray-200 items-center justify-center text-gray-500 font-bold shadow-sm">
+                        {name.charAt(0).toUpperCase()}
+                    </div>
+                </div>
+            );
+        };
+
+        const AppCard = ({ app, value, onChange }) => {
+            const options = [
+                { val: 'none', label: 'ไม่เคยใช้' },
+                { val: 'basic', label: 'เคยใช้' },
+                { val: 'pro', label: 'ใช้เป็นประจำ' }
+            ];
+
+            const currentValue = value || 'none';
+
+            return (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-3">
+                    <div className="flex items-center gap-3 mb-3">
+                        <AppLogo slug={app.slug} name={app.name} />
+                        <h3 className="font-semibold text-gray-800">{app.name}</h3>
+                    </div>
+                    <div className="flex gap-2 w-full">
+                        {options.map(opt => {
+                            const isSelected = currentValue === opt.val;
+                            return (
+                                <button
+                                    key={opt.val}
+                                    onClick={() => onChange(opt.val)}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-xl transition-colors ${
+                                        isSelected 
+                                        ? (opt.val === 'none' ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white shadow-md')
+                                        : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    {opt.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [step, setStep] = React.useState(0);
+            const [direction, setDirection] = React.useState('right');
+            const [userName, setUserName] = React.useState('');
+            const [customName, setCustomName] = React.useState('');
+            const [responses, setResponses] = React.useState({});
+            const [isSubmitting, setIsSubmitting] = React.useState(false);
+            const [submitError, setSubmitError] = React.useState('');
+
+            const finalName = userName === 'other' ? customName : userName;
+
+            const handleNext = () => {
+                setDirection('right');
+                setStep(prev => prev + 1);
+            };
+
+            const handleBack = () => {
+                setDirection('left');
+                setStep(prev => prev - 1);
+            };
+
+            const submitData = async () => {
+                setIsSubmitting(true);
+                setSubmitError('');
+
+                const payload = {
+                    name: finalName,
+                    responses: {}
+                };
+
+                categories.forEach(cat => {
+                    cat.apps.forEach(app => {
+                        const val = responses[cat.id]?.[app.id] || 'none';
+                        payload.responses[app.name] = val;
+                    });
+                    if (responses[cat.id]?.otherText) {
+                        payload.responses[`Other: ${cat.title}`] = responses[cat.id].otherText;
+                    }
+                });
+
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    handleNext();
+                } catch (error) {
+                    console.error('Submission error:', error);
+                    setSubmitError('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+                } finally {
+                    setIsSubmitting(false);
+                }
+            };
+
+            const handleNameSelect = (e) => {
+                const val = e.target.value;
+                setUserName(val);
+                if (val !== 'other' && val !== '') {
+                    setTimeout(handleNext, 300);
+                }
+            };
+
+            const handleAppChange = (categoryId, appId, value) => {
+                setResponses(prev => ({
+                    ...prev,
+                    [categoryId]: {
+                        ...prev[categoryId],
+                        [appId]: value
+                    }
+                }));
+            };
+
+            const handleOtherTextChange = (categoryId, text) => {
+                setResponses(prev => ({
+                    ...prev,
+                    [categoryId]: {
+                        ...prev[categoryId],
+                        otherText: text
+                    }
+                }));
+            };
+
+            const renderNameSelection = () => (
+                <div key="step-0" className={`w-full max-w-md mx-auto p-6 flex flex-col min-h-screen ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
+                    <div className="mt-12 flex-1">
+                        <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">ยินดีต้อนรับ</h1>
+                        <p className="text-gray-500 mb-8">กรุณาเลือกชื่อของคุณเพื่อเริ่มแบบสำรวจ</p>
+                        
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-4">
+                            <select 
+                                className="w-full p-4 bg-transparent outline-none text-gray-800 text-lg appearance-none cursor-pointer"
+                                value={userName}
+                                onChange={handleNameSelect}
+                            >
+                                <option value="" disabled>-- เลือกชื่อของคุณ --</option>
+                                {names.map((name, i) => (
+                                    <option key={i} value={name}>{name}</option>
+                                ))}
+                                <option value="other">อื่นๆ (ระบุ)</option>
+                            </select>
+                        </div>
+
+                        {userName === 'other' && (
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 slide-enter-right">
+                                <input 
+                                    type="text" 
+                                    placeholder="พิมพ์ชื่อของคุณ..." 
+                                    className="w-full p-4 bg-transparent outline-none text-gray-800 text-lg"
+                                    value={customName}
+                                    onChange={(e) => setCustomName(e.target.value)}
+                                />
+                            </div>
+                        )}
+
+                        {userName === 'other' && customName.trim() !== '' && (
+                            <button 
+                                onClick={handleNext}
+                                className="w-full bg-blue-600 text-white font-semibold text-lg py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-colors"
+                            >
+                                เริ่มแบบสำรวจ
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+
+            const renderCategory = (categoryIndex) => {
+                const category = categories[categoryIndex];
+                const catResponses = responses[category.id] || {};
+                const isLastCategory = categoryIndex === categories.length - 1;
+
+                return (
+                    <div key={`step-${categoryIndex + 1}`} className={`w-full max-w-md mx-auto p-4 flex flex-col min-h-screen ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
+                        <div className="flex items-center justify-between mb-6 mt-4">
+                            <button onClick={handleBack} className="p-2 text-gray-400 hover:text-gray-600 bg-white rounded-full shadow-sm" disabled={isSubmitting}>
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <span className="text-sm font-semibold text-gray-400">
+                                หมวดหมู่ที่ {categoryIndex + 1} จาก {categories.length}
+                            </span>
+                        </div>
+
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6 leading-tight">
+                            {category.title}
+                        </h2>
+
+                        <div className="flex-1 pb-24">
+                            {category.apps.map(app => (
+                                <AppCard 
+                                    key={app.id} 
+                                    app={app} 
+                                    value={catResponses[app.id]} 
+                                    onChange={(val) => handleAppChange(category.id, app.id, val)}
+                                />
+                            ))}
+
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mt-6">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    แอป/โปรแกรมอื่นๆ ในหมวดหมู่นี้ที่คุณเคยใช้
+                                </label>
+                                <textarea 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none focus:border-blue-400 transition-colors"
+                                    rows="2"
+                                    placeholder="ระบุชื่อโปรแกรม (ถ้ามี)..."
+                                    value={catResponses.otherText || ''}
+                                    onChange={(e) => handleOtherTextChange(category.id, e.target.value)}
+                                ></textarea>
+                            </div>
+                            
+                            {submitError && (
+                                <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm text-center">
+                                    {submitError}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 flex justify-center z-10">
+                            <div className="w-full max-w-md flex gap-3">
+                                <button 
+                                    onClick={isLastCategory ? submitData : handleNext}
+                                    disabled={isSubmitting}
+                                    className={`flex-1 flex justify-center items-center text-white font-semibold text-lg py-4 rounded-2xl shadow-lg transition-colors ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                >
+                                    {isSubmitting ? <div className="spinner"></div> : (isLastCategory ? 'ส่งคำตอบ' : 'ถัดไป')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderComplete = () => {
+                return (
+                    <div key="step-finish" className={`w-full max-w-md mx-auto p-6 flex flex-col items-center justify-center min-h-screen text-center ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
+                        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                            <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">ขอบคุณค่ะ/ครับ</h2>
+                        <p className="text-gray-600 text-lg mb-8">
+                            คุณ <span className="font-semibold text-gray-800">{finalName}</span><br/>
+                            ระบบได้บันทึกข้อมูลของคุณเรียบร้อยแล้ว
+                        </p>
+                    </div>
+                );
+            };
+
+            if (step === 0) return renderNameSelection();
+            if (step > 0 && step <= categories.length) return renderCategory(step - 1);
+            return renderComplete();
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

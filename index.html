@@ -555,6 +555,89 @@
             box-shadow: var(--shadow-hard);
             transform: rotate(4deg);
         }
+        .doodle-summary {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        .doodle-summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .doodle-summary-stat {
+            flex: 1 1 5.5rem;
+            min-width: 5.5rem;
+            padding: 0.5rem 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.25;
+            border: 2px solid var(--ink);
+            border-radius: var(--sketch-radius-sm);
+            box-shadow: 2px 2px 0 var(--ink);
+        }
+        .doodle-summary-stat strong {
+            display: block;
+            font-size: 1.125rem;
+            margin-bottom: 0.1rem;
+        }
+        .doodle-summary-stat--none { background: var(--lavender); }
+        .doodle-summary-stat--basic { background: var(--mint); }
+        .doodle-summary-stat--pro { background: var(--coral); color: #fff; }
+        .doodle-summary-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 2px dashed rgba(50, 50, 50, 0.2);
+        }
+        .doodle-summary-section:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        .doodle-summary-cat {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--ink-dark);
+            margin-bottom: 0.35rem;
+            line-height: 1.3;
+        }
+        .doodle-summary-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.35rem 0.5rem;
+            margin-bottom: 0.35rem;
+            font-size: 0.8rem;
+        }
+        .doodle-summary-row-label {
+            flex-shrink: 0;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            border: 1.5px solid var(--ink);
+            border-radius: var(--sketch-radius-pill);
+        }
+        .doodle-summary-row-label--pro {
+            background: var(--coral);
+            color: #fff;
+        }
+        .doodle-summary-row-label--basic {
+            background: var(--mint);
+            color: var(--ink-dark);
+        }
+        .doodle-summary-apps {
+            color: var(--ink);
+            line-height: 1.4;
+        }
+        .doodle-summary-extra {
+            font-size: 0.8rem;
+            color: var(--ink);
+            line-height: 1.45;
+            margin-top: 0.25rem;
+        }
         .doodle-label {
             font-size: 0.875rem;
             font-weight: 700;
@@ -1072,6 +1155,117 @@
             );
         };
 
+        const PROFICIENCY_LABELS = {
+            none: 'ไม่เคยใช้',
+            basic: 'เคยใช้',
+            pro: 'ใช้เป็นประจำ'
+        };
+
+        const computeResultSummary = (responses) => {
+            const counts = { none: 0, basic: 0, pro: 0 };
+            const byCategory = [];
+
+            categories.forEach((cat) => {
+                const catResp = responses[cat.id] || {};
+                const pro = [];
+                const basic = [];
+
+                cat.apps.forEach((app) => {
+                    const val = catResp[app.id] || 'none';
+                    counts[val]++;
+                    if (val === 'pro') pro.push(app.name);
+                    if (val === 'basic') basic.push(app.name);
+                });
+
+                const otherText = (catResp.otherText || '').trim();
+                if (pro.length || basic.length || otherText) {
+                    byCategory.push({
+                        title: cat.title.split(' (')[0],
+                        pro,
+                        basic,
+                        otherText
+                    });
+                }
+            });
+
+            return { counts, byCategory };
+        };
+
+        const ResultMiniSummary = ({ responses, skillsToDevelop, pastWork }) => {
+            const summary = React.useMemo(() => computeResultSummary(responses), [responses]);
+            const { counts, byCategory } = summary;
+            const hasExtra = skillsToDevelop.trim() || pastWork.trim();
+            const hasUsage = byCategory.length > 0;
+
+            return (
+                <div className="doodle-card doodle-summary p-4 relative z-[1] text-left w-full">
+                    <h3 className="doodle-label text-center mb-3">สรุปผลการตอบแบบสำรวจ</h3>
+                    <div className="doodle-summary-stats">
+                        <div className="doodle-summary-stat doodle-summary-stat--pro">
+                            <strong>{counts.pro}</strong>
+                            {PROFICIENCY_LABELS.pro}
+                        </div>
+                        <div className="doodle-summary-stat doodle-summary-stat--basic">
+                            <strong>{counts.basic}</strong>
+                            {PROFICIENCY_LABELS.basic}
+                        </div>
+                        <div className="doodle-summary-stat doodle-summary-stat--none">
+                            <strong>{counts.none}</strong>
+                            {PROFICIENCY_LABELS.none}
+                        </div>
+                    </div>
+
+                    {hasUsage ? (
+                        byCategory.map((cat) => (
+                            <div key={cat.title} className="doodle-summary-section">
+                                <div className="doodle-summary-cat">{cat.title}</div>
+                                {cat.pro.length > 0 && (
+                                    <div className="doodle-summary-row">
+                                        <span className="doodle-summary-row-label doodle-summary-row-label--pro">
+                                            {PROFICIENCY_LABELS.pro}
+                                        </span>
+                                        <span className="doodle-summary-apps">{cat.pro.join(', ')}</span>
+                                    </div>
+                                )}
+                                {cat.basic.length > 0 && (
+                                    <div className="doodle-summary-row">
+                                        <span className="doodle-summary-row-label doodle-summary-row-label--basic">
+                                            {PROFICIENCY_LABELS.basic}
+                                        </span>
+                                        <span className="doodle-summary-apps">{cat.basic.join(', ')}</span>
+                                    </div>
+                                )}
+                                {cat.otherText && (
+                                    <div className="doodle-summary-extra">
+                                        <span className="font-bold">อื่นๆ:</span> {cat.otherText}
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="doodle-subtitle text-sm text-center">ยังไม่มีรายการที่เลือกใช้งาน</p>
+                    )}
+
+                    {hasExtra && (
+                        <div className="doodle-summary-section">
+                            <div className="doodle-summary-cat">ข้อมูลเพิ่มเติม</div>
+                            {skillsToDevelop.trim() && (
+                                <div className="doodle-summary-extra mb-2">
+                                    <span className="font-bold">ทักษะที่ต้องการพัฒนา:</span>{' '}
+                                    {skillsToDevelop.trim()}
+                                </div>
+                            )}
+                            {pastWork.trim() && (
+                                <div className="doodle-summary-extra">
+                                    <span className="font-bold">ผลงานที่เคยทำ:</span> {pastWork.trim()}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         const AppCard = ({ app, value, onChange }) => {
             const options = [
                 { val: 'none', label: 'ไม่เคยใช้', selectedClass: 'doodle-btn-none' },
@@ -1389,18 +1583,25 @@
 
             const renderComplete = () => {
                 return (
-                    <div key="step-finish" className={`doodle-page w-full max-w-md mx-auto px-4 py-6 sm:p-6 flex flex-col items-center justify-center min-h-[100dvh] text-center relative z-[1] ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
+                    <div key="step-finish" className={`doodle-page w-full max-w-md mx-auto px-4 py-6 sm:p-6 flex flex-col items-center min-h-[100dvh] text-center relative z-[1] ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
                         <DoodleDecorations />
+                        <div className="w-full flex flex-col items-center pt-4 pb-8">
                         <div className="doodle-thanks-icon flex items-center justify-center mb-6">
                             <svg className="w-12 h-12" style={{ color: 'var(--ink)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
                             </svg>
                         </div>
                         <h2 className="doodle-title doodle-title-playful text-2xl sm:text-3xl uppercase mb-4 leading-tight">ขอบคุณค่ะ/ครับ</h2>
-                        <p className="doodle-subtitle text-base sm:text-lg mb-8 leading-relaxed px-2">
+                        <p className="doodle-subtitle text-base sm:text-lg mb-6 leading-relaxed px-2">
                             คุณ <span className="font-bold" style={{ color: 'var(--ink-dark)' }}>{finalName}</span><br/>
                             ระบบได้บันทึกข้อมูลของคุณเรียบร้อยแล้ว
                         </p>
+                        <ResultMiniSummary
+                            responses={responses}
+                            skillsToDevelop={skillsToDevelop}
+                            pastWork={pastWork}
+                        />
+                        </div>
                     </div>
                 );
             };

@@ -55,8 +55,139 @@
         /* —— Doodle utilities —— */
         .doodle-page {
             position: relative;
-            background-color: var(--paper-warm);
+            background-color: transparent;
             min-height: 100dvh;
+        }
+
+        /* —— Pastel bubble background (animate-ui / GlitchWorker inspired) —— */
+        .bubble-bg {
+            --bubble-color-1: 255, 196, 196;
+            --bubble-color-2: 210, 205, 255;
+            --bubble-color-3: 180, 230, 225;
+            --bubble-color-4: 255, 210, 220;
+            --bubble-color-5: 255, 245, 200;
+            --bubble-color-6: 200, 195, 250;
+            --bubble-gradient-stop: 0.38;
+            --bubble-circle-size: 62%;
+            --bubble-blur: 52px;
+            --bubble-blending: soft-light;
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+            background: linear-gradient(165deg, var(--paper-warm) 0%, var(--paper) 45%, #fffbf0 100%);
+        }
+        .bubble-bg svg {
+            position: fixed;
+            width: 0;
+            height: 0;
+        }
+        .bubble-bg-gradients {
+            filter: url(#bubble-goo) blur(var(--bubble-blur));
+            width: 100%;
+            height: 100%;
+            opacity: 0.85;
+        }
+        .bubble-bg-gradients > div {
+            position: absolute;
+            mix-blend-mode: var(--bubble-blending);
+        }
+        .bubble-g1 {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-1), var(--bubble-gradient-stop)) 0, rgba(var(--bubble-color-1), 0) 52%) no-repeat;
+            width: var(--bubble-circle-size);
+            height: var(--bubble-circle-size);
+            top: calc(50% - var(--bubble-circle-size) / 2);
+            left: calc(50% - var(--bubble-circle-size) / 2);
+            transform-origin: center center;
+            animation: bubble-move-vertical 36s ease-in-out infinite;
+        }
+        .bubble-g2 {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-2), var(--bubble-gradient-stop)) 0, rgba(var(--bubble-color-2), 0) 52%) no-repeat;
+            width: var(--bubble-circle-size);
+            height: var(--bubble-circle-size);
+            top: calc(50% - var(--bubble-circle-size) / 2);
+            left: calc(50% - var(--bubble-circle-size) / 2);
+            transform-origin: calc(50% - 320px);
+            animation: bubble-move-circle 28s ease-in-out infinite reverse;
+        }
+        .bubble-g3 {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-3), var(--bubble-gradient-stop)) 0, rgba(var(--bubble-color-3), 0) 52%) no-repeat;
+            width: var(--bubble-circle-size);
+            height: var(--bubble-circle-size);
+            top: calc(50% - var(--bubble-circle-size) / 2 + 160px);
+            left: calc(50% - var(--bubble-circle-size) / 2 - 380px);
+            transform-origin: calc(50% + 320px);
+            animation: bubble-move-circle 44s linear infinite;
+        }
+        .bubble-g4 {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-4), calc(var(--bubble-gradient-stop) * 0.9)) 0, rgba(var(--bubble-color-4), 0) 52%) no-repeat;
+            width: var(--bubble-circle-size);
+            height: var(--bubble-circle-size);
+            top: calc(50% - var(--bubble-circle-size) / 2);
+            left: calc(50% - var(--bubble-circle-size) / 2);
+            transform-origin: calc(50% - 160px);
+            animation: bubble-move-horizontal 40s ease-in-out infinite;
+            opacity: 0.75;
+        }
+        .bubble-g5 {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-5), calc(var(--bubble-gradient-stop) * 0.85)) 0, rgba(var(--bubble-color-5), 0) 52%) no-repeat;
+            width: calc(var(--bubble-circle-size) * 1.6);
+            height: calc(var(--bubble-circle-size) * 1.6);
+            top: calc(50% - var(--bubble-circle-size) * 0.8);
+            left: calc(50% - var(--bubble-circle-size) * 0.8);
+            transform-origin: calc(50% - 600px) calc(50% + 160px);
+            animation: bubble-move-circle 32s ease-in-out infinite;
+            opacity: 0.7;
+        }
+        .bubble-g6 {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-6), calc(var(--bubble-gradient-stop) * 0.8)) 0, rgba(var(--bubble-color-6), 0) 55%) no-repeat;
+            width: calc(var(--bubble-circle-size) * 1.2);
+            height: calc(var(--bubble-circle-size) * 1.2);
+            top: calc(50% - var(--bubble-circle-size) * 0.6 + 80px);
+            left: calc(50% - var(--bubble-circle-size) * 0.6 + 200px);
+            transform-origin: calc(50% + 200px) calc(50% - 120px);
+            animation: bubble-move-vertical 48s ease-in-out infinite reverse;
+            opacity: 0.65;
+        }
+        .bubble-interactive {
+            background: radial-gradient(circle at center, rgba(var(--bubble-color-6), 0.28) 0, rgba(var(--bubble-color-6), 0) 50%) no-repeat;
+            width: 55%;
+            height: 55%;
+            top: -27.5%;
+            left: -27.5%;
+            opacity: 0.55;
+            will-change: transform;
+        }
+        @keyframes bubble-move-circle {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes bubble-move-vertical {
+            0% { transform: translateY(-42%); }
+            50% { transform: translateY(42%); }
+            100% { transform: translateY(-42%); }
+        }
+        @keyframes bubble-move-horizontal {
+            0% { transform: translateX(-42%) translateY(-8%); }
+            50% { transform: translateX(42%) translateY(8%); }
+            100% { transform: translateX(-42%) translateY(-8%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bubble-g1, .bubble-g2, .bubble-g3, .bubble-g4, .bubble-g5, .bubble-g6 {
+                animation: none;
+            }
+            .bubble-interactive { display: none; }
+        }
+        .app-root {
+            position: relative;
+            min-height: 100dvh;
+            isolation: isolate;
+        }
+        .app-root > .relative {
+            position: relative;
+            z-index: 1;
         }
         .doodle-lined-bg {
             background-color: var(--paper);
@@ -143,6 +274,150 @@
             background-repeat: no-repeat;
             background-position: right 1rem center;
             padding-right: 2.5rem;
+        }
+
+        /* —— Custom combobox (replaces native select dropdown) —— */
+        .doodle-combobox {
+            position: relative;
+            width: 100%;
+        }
+        .doodle-combobox-trigger {
+            width: 100%;
+            min-height: 48px;
+            padding: 0.85rem 2.5rem 0.85rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--ink-dark);
+            font-size: 1rem;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .doodle-combobox-trigger:focus-visible {
+            outline: 2px dashed var(--mint);
+            outline-offset: 2px;
+        }
+        .doodle-combobox-trigger-text {
+            flex: 1;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .doodle-combobox-placeholder {
+            color: var(--ink);
+            opacity: 0.55;
+        }
+        .doodle-combobox-chevron {
+            flex-shrink: 0;
+            width: 1rem;
+            height: 1rem;
+            color: var(--ink);
+            transition: transform 0.15s ease;
+        }
+        .doodle-combobox-trigger[aria-expanded="true"] .doodle-combobox-chevron {
+            transform: rotate(180deg);
+        }
+        .doodle-combobox-panel {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            z-index: 50;
+            padding: 0.5rem;
+            background-color: var(--paper);
+            border: var(--border-ink);
+            border-radius: var(--sketch-radius-sm);
+            box-shadow: var(--shadow-hard);
+            animation: doodle-dropdown-in 0.18s ease-out;
+        }
+        @keyframes doodle-dropdown-in {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .doodle-combobox-search-wrap {
+            padding: 0.25rem 0.25rem 0.5rem;
+            border-bottom: 2px dashed rgba(50, 50, 50, 0.12);
+            margin-bottom: 0.35rem;
+        }
+        .doodle-combobox-search {
+            width: 100%;
+            min-height: 40px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9375rem;
+            font-family: inherit;
+            color: var(--ink-dark);
+            background: var(--paper-warm);
+            border: 2px solid var(--ink);
+            border-radius: var(--sketch-radius-pill);
+            box-shadow: 2px 2px 0 var(--ink);
+            outline: none;
+        }
+        .doodle-combobox-search:focus {
+            box-shadow: 3px 3px 0 var(--ink);
+            outline: 2px dashed var(--mint);
+            outline-offset: 1px;
+        }
+        .doodle-combobox-search::placeholder {
+            color: var(--ink);
+            opacity: 0.45;
+        }
+        .doodle-combobox-list {
+            list-style: none;
+            margin: 0;
+            padding: 0.15rem;
+            max-height: min(16rem, 50vh);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .doodle-combobox-option {
+            min-height: 44px;
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 0.2rem;
+            font-size: 0.9375rem;
+            line-height: 1.35;
+            color: var(--ink-dark);
+            border: 2px solid transparent;
+            border-radius: var(--sketch-radius-pill);
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: background 0.1s ease, box-shadow 0.1s ease, transform 0.1s ease;
+        }
+        .doodle-combobox-option:last-child {
+            margin-bottom: 0;
+        }
+        .doodle-combobox-option:hover,
+        .doodle-combobox-option--highlighted {
+            background: var(--mint);
+            border-color: var(--ink);
+            box-shadow: 2px 2px 0 var(--ink);
+        }
+        .doodle-combobox-option--selected {
+            background: var(--lavender);
+            border-color: var(--ink);
+            box-shadow: 2px 2px 0 var(--ink);
+            font-weight: 700;
+        }
+        .doodle-combobox-option--selected.doodle-combobox-option--highlighted {
+            background: var(--lavender);
+        }
+        .doodle-combobox-empty {
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--ink);
+            opacity: 0.6;
+        }
+        .doodle-combobox-divider {
+            height: 0;
+            margin: 0.35rem 0.5rem;
+            border: none;
+            border-top: 2px dashed rgba(50, 50, 50, 0.15);
         }
         .doodle-textarea {
             min-height: 5rem;
@@ -373,7 +648,7 @@
                     { id: 'excel', name: 'Microsoft Excel', slug: 'microsoftexcel' },
                     { id: 'powerpoint', name: 'Microsoft PowerPoint', slug: 'microsoftpowerpoint' },
                     { id: 'onedrive', name: 'OneDrive', slug: 'microsoftonedrive' },
-                    { id: 'mforms', name: 'Microsoft Forms', slug: 'microsoft' },
+                    { id: 'mforms', name: 'Microsoft Forms', slug: 'microsoftforms' },
                     { id: 'coda', name: 'Coda', slug: 'coda' }
                 ]
             },
@@ -383,20 +658,20 @@
                 apps: [
                     { id: 'gmeet', name: 'Google Meet', slug: 'googlemeet' },
                     { id: 'gcalendar', name: 'Google Calendar', slug: 'googlecalendar' },
-                    { id: 'gcontacts', name: 'Google Contacts', slug: 'google' },
+                    { id: 'gcontacts', name: 'Google Contacts', slug: 'googlecontacts' },
                     { id: 'teams', name: 'Microsoft Teams', slug: 'microsoftteams' },
                     { id: 'outlook', name: 'Microsoft Outlook', slug: 'microsoftoutlook' },
                     { id: 'skype', name: 'Skype', slug: 'skype' },
-                    { id: 'people', name: 'Microsoft People', slug: 'microsoft' }
+                    { id: 'people', name: 'Microsoft People', slug: 'microsoftpeople' }
                 ]
             },
             {
                 id: 'tasks',
                 title: 'การจัดการงานและบันทึก (Tasks & Notes)',
                 apps: [
-                    { id: 'gtasks', name: 'Google Tasks', slug: 'google' },
-                    { id: 'notebooklm', name: 'NotebookLM', slug: 'google' },
-                    { id: 'todo', name: 'Microsoft To Do', slug: 'microsoft' },
+                    { id: 'gtasks', name: 'Google Tasks', slug: 'googletasks' },
+                    { id: 'notebooklm', name: 'NotebookLM', slug: 'notebooklm' },
+                    { id: 'todo', name: 'Microsoft To Do', slug: 'microsofttodo' },
                     { id: 'onenote', name: 'OneNote', slug: 'microsoftonenote' },
                     { id: 'obsidian', name: 'Obsidian', slug: 'obsidian' }
                 ]
@@ -406,19 +681,19 @@
                 title: 'ปัญญาประดิษฐ์ (AI Tools)',
                 apps: [
                     { id: 'gemini', name: 'Gemini', slug: 'googlegemini' },
-                    { id: 'aistudio', name: 'Google AI Studio', slug: 'google' },
-                    { id: 'glabs', name: 'Google Labs', slug: 'google' },
+                    { id: 'aistudio', name: 'Google AI Studio', slug: 'googleaistudio' },
+                    { id: 'glabs', name: 'Google Labs', slug: 'googlelabs' },
                     { id: 'chatgpt', name: 'ChatGPT', slug: 'openai' },
                     { id: 'copilot', name: 'Microsoft Copilot', slug: 'microsoftcopilot' },
                     { id: 'claude', name: 'Claude AI', slug: 'anthropic' },
                     { id: 'perplexity', name: 'Perplexity AI', slug: 'perplexity' },
                     { id: 'cursor', name: 'Cursor AI', slug: 'cursor' },
-                    { id: 'deepseek', name: 'Deepseek AI', slug: '' },
-                    { id: 'grok', name: 'Grok AI', slug: '' },
-                    { id: 'kimi', name: 'Kimi AI', slug: '' },
-                    { id: 'okara', name: 'Okara AI', slug: '' },
-                    { id: 'lovable', name: 'Lovable AI', slug: '' },
-                    { id: 'bolt', name: 'Bolt', slug: '' }
+                    { id: 'deepseek', name: 'Deepseek AI', slug: 'deepseek' },
+                    { id: 'grok', name: 'Grok AI', slug: 'x' },
+                    { id: 'kimi', name: 'Kimi AI', slug: 'moonshotai' },
+                    { id: 'okara', name: 'Okara AI', slug: 'okara' },
+                    { id: 'lovable', name: 'Lovable AI', slug: 'lovable' },
+                    { id: 'bolt', name: 'Bolt', slug: 'bolt' }
                 ]
             },
             {
@@ -431,7 +706,7 @@
                     { id: 'powerbi', name: 'Power BI', slug: 'powerbi' },
                     { id: 'looker', name: 'Google Looker Studio', slug: 'looker' },
                     { id: 'ganalytics', name: 'Google Analytic', slug: 'googleanalytics' },
-                    { id: 'sway', name: 'Microsoft Sway', slug: 'microsoft' },
+                    { id: 'sway', name: 'Microsoft Sway', slug: 'sway' },
                     { id: 'clipchamp', name: 'Clipchamp', slug: 'clipchamp' }
                 ]
             },
@@ -439,7 +714,7 @@
                 id: 'builders',
                 title: 'สร้างเว็บไซต์และแอป (Web & App Builders)',
                 apps: [
-                    { id: 'gsite', name: 'Google Site', slug: 'google' },
+                    { id: 'gsite', name: 'Google Site', slug: 'googlesites' },
                     { id: 'wordpress', name: 'WordPress', slug: 'wordpress' },
                     { id: 'wix', name: 'Wix', slug: 'wix' },
                     { id: 'webflow', name: 'Webflow', slug: 'webflow' },
@@ -448,7 +723,7 @@
                     { id: 'bubble', name: 'Bubble', slug: 'bubble' },
                     { id: 'glide', name: 'Glide', slug: 'glide' },
                     { id: 'carrd', name: 'Carrd', slug: 'carrd' },
-                    { id: 'universe', name: 'Universe', slug: '' }
+                    { id: 'universe', name: 'Universe', slug: 'universe' }
                 ]
             },
             {
@@ -474,7 +749,7 @@
                 id: 'others',
                 title: 'เครื่องมืออื่นๆ (Other Tools)',
                 apps: [
-                    { id: 'gpass', name: 'Google Password Manager', slug: 'google' },
+                    { id: 'gpass', name: 'Google Password Manager', slug: 'googlepasswordmanager' },
                     { id: 'gauth', name: 'Google Authenticator', slug: 'googleauthenticator' },
                     { id: 'mauth', name: 'Microsoft Authenticator', slug: 'microsoftauthenticator' },
                     { id: 'gfonts', name: 'Google Fonts', slug: 'googlefonts' },
@@ -485,6 +760,144 @@
             }
         ];
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3wiQullgXFwEF8W3py7YltXQYP9feoog2bUf7_TgUtkkKR6d3ncLFzJpnVAlrvDcR4w/exec';
+
+        const FABRIC = 'https://static2.sharepointonline.com/files/fabric/assets/brand-icons/product/svg';
+        const ICONIFY = (name) => `https://api.iconify.design/logos/${name}.svg`;
+        const FAVICON = (domain) => `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
+        /** Explicit logo URLs where Simple Icons has no brand (or slug is generic). */
+        const APP_LOGOS = {
+            word: `${FABRIC}/word_48x1.svg`,
+            excel: `${FABRIC}/excel_48x1.svg`,
+            powerpoint: `${FABRIC}/powerpoint_48x1.svg`,
+            onedrive: ICONIFY('microsoft-onedrive'),
+            mforms: `${FABRIC}/forms_48x1.svg`,
+            gmeet: ICONIFY('google-meet'),
+            gcalendar: ICONIFY('google-calendar'),
+            gcontacts: FAVICON('contacts.google.com'),
+            teams: ICONIFY('microsoft-teams'),
+            outlook: `${FABRIC}/outlook_48x1.svg`,
+            skype: ICONIFY('skype'),
+            people: FAVICON('people.live.com'),
+            todo: FAVICON('to-do.microsoft.com'),
+            onenote: `${FABRIC}/onenote_48x1.svg`,
+            gemini: ICONIFY('google-gemini'),
+            aistudio: FAVICON('aistudio.google.com'),
+            glabs: FAVICON('labs.google'),
+            chatgpt: ICONIFY('openai-icon'),
+            copilot: ICONIFY('microsoft-icon'),
+            deepseek: ICONIFY('deepseek-icon'),
+            grok: ICONIFY('grok'),
+            kimi: ICONIFY('moonshot-ai'),
+            okara: FAVICON('okara.ai'),
+            lovable: FAVICON('lovable.dev'),
+            bolt: FAVICON('bolt.new'),
+            canva: FAVICON('canva.com'),
+            powerbi: ICONIFY('microsoft-power-bi'),
+            sway: `${FABRIC}/sway_48x1.svg`,
+            clipchamp: FAVICON('clipchamp.com'),
+            gsite: FAVICON('sites.google.com'),
+            universe: FAVICON('onuniverse.com'),
+            aws: ICONIFY('aws'),
+            azure: ICONIFY('microsoft-azure'),
+            weebly: ICONIFY('weebly'),
+            bubble: ICONIFY('bubble'),
+            codepen: ICONIFY('codepen-icon'),
+            gpass: FAVICON('passwords.google.com'),
+            mauth: ICONIFY('microsoft-icon')
+        };
+
+        /** Pastel bubble colors derived from site palette (coral, lavender, mint, yellow). */
+        const BUBBLE_COLORS = {
+            first: '255, 196, 196',   /* soft coral */
+            second: '210, 205, 255',  /* lavender */
+            third: '180, 230, 225',   /* mint */
+            fourth: '255, 210, 220',  /* coral-light */
+            fifth: '255, 245, 200',   /* yellow */
+            sixth: '200, 195, 250'    /* pale lavender (interactive) */
+        };
+
+        const BubbleBackground = ({ interactive = true, colors = BUBBLE_COLORS }) => {
+            const interactiveRef = React.useRef(null);
+            const targetRef = React.useRef({ x: 0, y: 0 });
+            const currentRef = React.useRef({ x: 0, y: 0 });
+            const rafRef = React.useRef(null);
+
+            const cssVars = {
+                '--bubble-color-1': colors.first,
+                '--bubble-color-2': colors.second,
+                '--bubble-color-3': colors.third,
+                '--bubble-color-4': colors.fourth,
+                '--bubble-color-5': colors.fifth,
+                '--bubble-color-6': colors.sixth
+            };
+
+            React.useEffect(() => {
+                if (!interactive) return;
+
+                const center = () => ({
+                    cx: window.innerWidth / 2,
+                    cy: window.innerHeight / 2
+                });
+                let c = center();
+
+                const onMove = (clientX, clientY) => {
+                    targetRef.current.x = clientX - c.cx;
+                    targetRef.current.y = clientY - c.cy;
+                };
+
+                const onMouseMove = (e) => onMove(e.clientX, e.clientY);
+                const onTouchMove = (e) => {
+                    if (e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
+                };
+                const onResize = () => { c = center(); };
+
+                const tick = () => {
+                    const el = interactiveRef.current;
+                    if (el) {
+                        currentRef.current.x += (targetRef.current.x - currentRef.current.x) * 0.06;
+                        currentRef.current.y += (targetRef.current.y - currentRef.current.y) * 0.06;
+                        el.style.transform = `translate(${Math.round(currentRef.current.x)}px, ${Math.round(currentRef.current.y)}px)`;
+                    }
+                    rafRef.current = requestAnimationFrame(tick);
+                };
+                rafRef.current = requestAnimationFrame(tick);
+
+                window.addEventListener('mousemove', onMouseMove, { passive: true });
+                window.addEventListener('touchmove', onTouchMove, { passive: true });
+                window.addEventListener('resize', onResize, { passive: true });
+
+                return () => {
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('touchmove', onTouchMove);
+                    window.removeEventListener('resize', onResize);
+                    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+                };
+            }, [interactive]);
+
+            return (
+                <div className="bubble-bg" style={cssVars} aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="bubble-goo">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+                                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 14 -6" result="goo" />
+                                <feBlend in="SourceGraphic" in2="goo" />
+                            </filter>
+                        </defs>
+                    </svg>
+                    <div className="bubble-bg-gradients">
+                        <div className="bubble-g1" />
+                        <div className="bubble-g2" />
+                        <div className="bubble-g3" />
+                        <div className="bubble-g4" />
+                        <div className="bubble-g5" />
+                        <div className="bubble-g6" />
+                        {interactive && <div ref={interactiveRef} className="bubble-interactive" />}
+                    </div>
+                </div>
+            );
+        };
 
         const DoodleDecorations = () => (
             <>
@@ -511,8 +924,9 @@
             </>
         );
 
-        const AppLogo = ({ slug, name }) => {
-            if (!slug) {
+        const AppLogo = ({ id, slug, name }) => {
+            const src = APP_LOGOS[id] || (slug ? `https://cdn.simpleicons.org/${slug}` : null);
+            if (!src) {
                 return (
                     <div className="doodle-logo-fallback flex items-center justify-center shrink-0">
                         {name.charAt(0).toUpperCase()}
@@ -522,7 +936,7 @@
             return (
                 <div className="relative w-10 h-10 shrink-0">
                     <img 
-                        src={`https://cdn.simpleicons.org/${slug}`}
+                        src={src}
                         alt={name}
                         className="w-10 h-10 object-contain"
                         onError={(e) => {
@@ -530,9 +944,130 @@
                             e.target.nextSibling.style.display = 'flex';
                         }}
                     />
-                    <div className="doodle-logo-fallback hidden items-center justify-center">
+                    <div className="doodle-logo-fallback hidden items-center justify-center absolute inset-0">
                         {name.charAt(0).toUpperCase()}
                     </div>
+                </div>
+            );
+        };
+
+        const DoodleSelect = ({ value, onChange, placeholder, options }) => {
+            const [open, setOpen] = React.useState(false);
+            const [filter, setFilter] = React.useState('');
+            const [highlight, setHighlight] = React.useState(-1);
+            const rootRef = React.useRef(null);
+            const searchRef = React.useRef(null);
+
+            const selected = options.find((o) => o.value === value);
+            const displayText = selected ? selected.label : placeholder;
+
+            const filtered = React.useMemo(() => {
+                const q = filter.trim().toLowerCase();
+                if (!q) return options;
+                return options.filter((o) => o.label.toLowerCase().includes(q));
+            }, [options, filter]);
+
+            const close = React.useCallback(() => {
+                setOpen(false);
+                setFilter('');
+                setHighlight(-1);
+            }, []);
+
+            const choose = React.useCallback((val) => {
+                onChange(val);
+                close();
+            }, [onChange, close]);
+
+            React.useEffect(() => {
+                if (!open) return;
+                const t = setTimeout(() => searchRef.current?.focus(), 50);
+                return () => clearTimeout(t);
+            }, [open]);
+
+            React.useEffect(() => {
+                if (!open) return;
+                const onPointerDown = (e) => {
+                    if (!rootRef.current?.contains(e.target)) close();
+                };
+                const onKeyDown = (e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        close();
+                        return;
+                    }
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setHighlight((h) => Math.min(h + 1, filtered.length - 1));
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setHighlight((h) => Math.max(h - 1, 0));
+                    } else if (e.key === 'Enter' && highlight >= 0 && filtered[highlight]) {
+                        e.preventDefault();
+                        choose(filtered[highlight].value);
+                    }
+                };
+                document.addEventListener('mousedown', onPointerDown);
+                document.addEventListener('keydown', onKeyDown);
+                return () => {
+                    document.removeEventListener('mousedown', onPointerDown);
+                    document.removeEventListener('keydown', onKeyDown);
+                };
+            }, [open, highlight, filtered, close, choose]);
+
+            React.useEffect(() => {
+                setHighlight(filtered.length ? 0 : -1);
+            }, [filter, open]);
+
+            return (
+                <div className="doodle-combobox" ref={rootRef}>
+                    <button
+                        type="button"
+                        className="doodle-combobox-trigger"
+                        aria-expanded={open}
+                        aria-haspopup="listbox"
+                        onClick={() => setOpen((o) => !o)}
+                    >
+                        <span className={`doodle-combobox-trigger-text ${!value ? 'doodle-combobox-placeholder' : ''}`}>
+                            {displayText}
+                        </span>
+                        <svg className="doodle-combobox-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                            <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </button>
+                    {open && (
+                        <div className="doodle-combobox-panel" role="presentation">
+                            <div className="doodle-combobox-search-wrap">
+                                <input
+                                    ref={searchRef}
+                                    type="search"
+                                    className="doodle-combobox-search"
+                                    placeholder="ค้นหาชื่อ..."
+                                    value={filter}
+                                    onChange={(e) => setFilter(e.target.value)}
+                                    aria-label="ค้นหาชื่อ"
+                                    autoComplete="off"
+                                />
+                            </div>
+                            <ul className="doodle-combobox-list hide-scrollbar" role="listbox" aria-label={placeholder}>
+                                {filtered.length === 0 ? (
+                                    <li className="doodle-combobox-empty">ไม่พบชื่อที่ค้นหา</li>
+                                ) : (
+                                    filtered.map((opt, i) => (
+                                        <li
+                                            key={opt.value}
+                                            role="option"
+                                            aria-selected={value === opt.value}
+                                            className={`doodle-combobox-option${value === opt.value ? ' doodle-combobox-option--selected' : ''}${highlight === i ? ' doodle-combobox-option--highlighted' : ''}`}
+                                            onMouseEnter={() => setHighlight(i)}
+                                            onClick={() => choose(opt.value)}
+                                        >
+                                            {opt.label}
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -549,7 +1084,7 @@
             return (
                 <div className="doodle-card p-4 mb-3 relative z-[1]">
                     <div className="flex items-center gap-3 mb-3">
-                        <AppLogo slug={app.slug} name={app.name} />
+                        <AppLogo id={app.id} slug={app.slug} name={app.name} />
                         <h3 className="font-bold text-base leading-snug" style={{ color: 'var(--ink-dark)' }}>{app.name}</h3>
                     </div>
                     <div className="flex gap-2 w-full">
@@ -577,6 +1112,8 @@
             const [userName, setUserName] = React.useState('');
             const [customName, setCustomName] = React.useState('');
             const [responses, setResponses] = React.useState({});
+            const [skillsToDevelop, setSkillsToDevelop] = React.useState('');
+            const [pastWork, setPastWork] = React.useState('');
             const [isSubmitting, setIsSubmitting] = React.useState(false);
             const [submitError, setSubmitError] = React.useState('');
 
@@ -611,6 +1148,13 @@
                     }
                 });
 
+                if (skillsToDevelop.trim()) {
+                    payload.responses['ทักษะหรือเทคโนโลยีด้านใดที่ท่านคิดว่าจำเป็นที่สุดและต้องการได้รับการพัฒนาเพื่อสนับสนุนการทำงานในปัจจุบัน'] = skillsToDevelop.trim();
+                }
+                if (pastWork.trim()) {
+                    payload.responses['ผลงานที่เคยทำ'] = pastWork.trim();
+                }
+
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
@@ -630,13 +1174,17 @@
                 }
             };
 
-            const handleNameSelect = (e) => {
-                const val = e.target.value;
+            const handleNameSelect = (val) => {
                 setUserName(val);
                 if (val !== 'other' && val !== '') {
                     setTimeout(handleNext, 300);
                 }
             };
+
+            const nameOptions = React.useMemo(() => [
+                ...names.map((name) => ({ value: name, label: name })),
+                { value: 'other', label: 'อื่นๆ (ระบุ)' }
+            ], []);
 
             const handleAppChange = (categoryId, appId, value) => {
                 setResponses(prev => ({
@@ -671,17 +1219,12 @@
                         <p className="doodle-subtitle text-base mb-6 sm:mb-8 leading-relaxed">กรุณาเลือกชื่อของคุณเพื่อเริ่มแบบสำรวจ</p>
                         
                         <div className="doodle-input-wrap mb-4">
-                            <select 
-                                className="doodle-select appearance-none cursor-pointer"
+                            <DoodleSelect
                                 value={userName}
                                 onChange={handleNameSelect}
-                            >
-                                <option value="" disabled>-- เลือกชื่อของคุณ --</option>
-                                {names.map((name, i) => (
-                                    <option key={i} value={name}>{name}</option>
-                                ))}
-                                <option value="other">อื่นๆ (ระบุ)</option>
-                            </select>
+                                placeholder="-- เลือกชื่อของคุณ --"
+                                options={nameOptions}
+                            />
                         </div>
 
                         {userName === 'other' && (
@@ -715,8 +1258,6 @@
             const renderCategory = (categoryIndex) => {
                 const category = categories[categoryIndex];
                 const catResponses = responses[category.id] || {};
-                const isLastCategory = categoryIndex === categories.length - 1;
-
                 return (
                     <div key={`step-${categoryIndex + 1}`} className={`doodle-page w-full max-w-md mx-auto px-4 py-5 sm:p-6 flex flex-col min-h-[100dvh] relative z-[1] ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
                         <DoodleDecorations />
@@ -760,28 +1301,91 @@
                                 ></textarea>
                             </div>
                             
-                            {submitError && (
-                                <div className="doodle-error">
-                                    {submitError}
-                                </div>
-                            )}
                         </div>
 
                         <div className="doodle-bottom-bar flex justify-center">
                             <div className="w-full max-w-md flex gap-3">
                                 <button 
                                     type="button"
-                                    onClick={isLastCategory ? submitData : handleNext}
+                                    onClick={handleNext}
                                     disabled={isSubmitting}
                                     className="doodle-btn-primary flex-1 flex justify-center items-center w-full"
                                 >
-                                    {isSubmitting ? <div className="spinner"></div> : (isLastCategory ? 'ส่งคำตอบ' : 'ถัดไป')}
+                                    ถัดไป
                                 </button>
                             </div>
                         </div>
                     </div>
                 );
             };
+
+            const renderExtraQuestions = () => (
+                <div key="step-extra" className={`doodle-page w-full max-w-md mx-auto px-4 py-5 sm:p-6 flex flex-col min-h-[100dvh] relative z-[1] ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
+                    <DoodleDecorations />
+                    <div className="flex items-center justify-between mb-5 sm:mb-6 mt-2 sm:mt-4">
+                        <button type="button" onClick={handleBack} className="doodle-back" disabled={isSubmitting} aria-label="ย้อนกลับ">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <span className="doodle-badge">คำถามเพิ่มเติม</span>
+                    </div>
+
+                    <div className="doodle-category-header mb-5 sm:mb-6">
+                        <h2 className="doodle-title text-lg sm:text-xl leading-snug">
+                            ข้อมูลเพิ่มเติม (ไม่บังคับ)
+                        </h2>
+                        <p className="doodle-subtitle text-sm mt-2 leading-relaxed">ตอบหรือข้ามได้ตามสะดวก</p>
+                    </div>
+
+                    <div className="flex-1 pb-28 sm:pb-24">
+                        <div className="doodle-card p-4 mb-4 relative z-[1]">
+                            <label className="doodle-label block mb-2 leading-snug">
+                                1. ทักษะหรือเทคโนโลยีด้านใดที่ท่านคิดว่าจำเป็นที่สุดและต้องการได้รับการพัฒนาเพื่อสนับสนุนการทำงานในปัจจุบัน
+                            </label>
+                            <textarea
+                                className="doodle-textarea doodle-textarea-field"
+                                rows="4"
+                                placeholder="ระบุทักษะหรือเทคโนโลยี (ถ้ามี)..."
+                                value={skillsToDevelop}
+                                onChange={(e) => setSkillsToDevelop(e.target.value)}
+                            ></textarea>
+                        </div>
+
+                        <div className="doodle-card p-4 relative z-[1]">
+                            <label className="doodle-label block mb-2 leading-snug">
+                                2. ผลงานที่เคยทำ
+                            </label>
+                            <textarea
+                                className="doodle-textarea doodle-textarea-field"
+                                rows="4"
+                                placeholder="ระบุผลงานที่เคยทำ (ถ้ามี)..."
+                                value={pastWork}
+                                onChange={(e) => setPastWork(e.target.value)}
+                            ></textarea>
+                        </div>
+
+                        {submitError && (
+                            <div className="doodle-error mt-4">
+                                {submitError}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="doodle-bottom-bar flex justify-center">
+                        <div className="w-full max-w-md flex gap-3">
+                            <button
+                                type="button"
+                                onClick={submitData}
+                                disabled={isSubmitting}
+                                className="doodle-btn-primary flex-1 flex justify-center items-center w-full"
+                            >
+                                {isSubmitting ? <div className="spinner"></div> : 'ส่งคำตอบ'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
 
             const renderComplete = () => {
                 return (
@@ -803,11 +1407,21 @@
 
             if (step === 0) return renderNameSelection();
             if (step > 0 && step <= categories.length) return renderCategory(step - 1);
+            if (step === categories.length + 1) return renderExtraQuestions();
             return renderComplete();
         };
 
+        const AppShell = () => (
+            <div className="app-root">
+                <BubbleBackground interactive />
+                <div className="relative">
+                    <App />
+                </div>
+            </div>
+        );
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(<AppShell />);
     </script>
 </body>
 </html>

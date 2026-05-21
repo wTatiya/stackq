@@ -1,6 +1,9 @@
 /**
- * StackQ survey backend — deploy as Web App (Execute as: Me, Access: Anyone).
- * Sheet columns: Timestamp | Name | Responses (JSON) | SubmittedAt (ISO, optional)
+ * StackQ survey backend
+ * Deploy: Web app → Execute as Me → Who has access: Anyone
+ * Then Deploy → Manage deployments → Edit → New version → Deploy
+ *
+ * Sheet row 1: Timestamp | Name | Google Doc | Google Sheet | ... (one column per app)
  */
 var ADMIN_KEY = 'somdej2445';
 
@@ -8,13 +11,10 @@ function doPost(e) {
   try {
     var sheet = getSheet_();
     var body = JSON.parse(e.postData.contents);
-    var ts = new Date();
-    var submittedAt = body.submittedAt || ts.toISOString();
-    var responsesJson = JSON.stringify(body.responses || {});
-    sheet.appendRow([ts, body.name || '', responsesJson, submittedAt]);
-    return jsonOut_({ ok: true });
+    appendSubmissionRow_(sheet, body);
+    return respond_({ ok: true }, e);
   } catch (err) {
-    return jsonOut_({ ok: false, error: String(err) });
+    return respond_({ ok: false, error: String(err) }, e);
   }
 }
 
@@ -23,24 +23,64 @@ function doGet(e) {
   var action = (params.action || '').toLowerCase();
 
   if (action !== 'list') {
-    return jsonOut_({ ok: false, error: 'Use ?action=list&key=...' });
+    return respond_({ ok: false, error: 'Use ?action=list&key=...' }, e);
   }
 
   if ((params.key || '') !== ADMIN_KEY) {
-    return jsonOut_({ ok: false, error: 'Unauthorized' });
+    return respond_({ ok: false, error: 'Unauthorized' }, e);
   }
 
   try {
-    return jsonOut_(buildSessionsPayload_());
+    return respond_(buildSessionsPayload_(), e);
   } catch (err) {
-    return jsonOut_({ ok: false, error: String(err) });
+    return respond_({ ok: false, error: String(err) }, e);
   }
 }
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Responses') || ss.getSheets()[0];
-  return sheet;
+  return ss.getSheetByName('Responses') || ss.getSheets()[0];
+}
+
+function getHeaders_(sheet) {
+  var lastCol = Math.max(sheet.getLastColumn(), 2);
+  return sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function (h) {
+    return String(h || '').trim();
+  });
+}
+
+function appendSubmissionRow_(sheet, body) {
+  var headers = getHeaders_(sheet);
+  var responses = body.responses || {};
+  var ts = new Date();
+
+  if (headers.length < 2 || headers[0] !== 'Timestamp') {
+    ensureHeaders_(sheet, Object.keys(responses));
+    headers = getHeaders_(sheet);
+  }
+
+  var row = headers.map(function (header, i) {
+    if (header === 'Timestamp') return ts;
+    if (header === 'Name') return body.name || '';
+    if (responses[header] !== undefined && responses[header] !== '') {
+      return responses[header];
+    }
+    return '';
+  });
+
+  sheet.appendRow(row);
+}
+
+function ensureHeaders_(sheet, responseKeys) {
+  var existing = getHeaders_(sheet);
+  if (existing.length >= 2 && existing[0] === 'Timestamp') {
+    return;
+  }
+  var base = ['Timestamp', 'Name'];
+  responseKeys.forEach(function (k) {
+    if (base.indexOf(k) === -1) base.push(k);
+  });
+  sheet.getRange(1, 1, 1, base.length).setValues([base]);
 }
 
 function buildSessionsPayload_() {
@@ -50,41 +90,67 @@ function buildSessionsPayload_() {
     return { ok: true, sessions: [], totalSubmissions: 0 };
   }
 
-  var colCount = Math.max(sheet.getLastColumn(), 3);
-  var values = sheet.getRange(2, 1, lastRow, colCount).getValues();
+  var headers = getHeaders_(sheet);
+  var lastCol = headers.length;
+  var values = sheet.getRange(2, 1, lastRow, lastCol).getValues();
   var submissions = [];
 
   values.forEach(function (row) {
-    var timestamp = row[0];
-    var name = String(row[1] || '').trim();
-    var responsesRaw = row[2];
-    var submittedAtCell = colCount >= 4 ? row[3] : null;
-
-    if (!name) return;
-
-    var responses = {};
-    try {
-      if (typeof responsesRaw === 'string' && responsesRaw) {
-        responses = JSON.parse(responsesRaw);
-      } else if (responsesRaw && typeof responsesRaw === 'object') {
-        responses = responsesRaw;
-      }
-    } catch (parseErr) {
-      responses = {};
-    }
-
-    var submittedAt = submittedAtCell
-      ? new Date(submittedAtCell).toISOString()
-      : (timestamp instanceof Date ? timestamp.toISOString() : new Date().toISOString());
-
-    submissions.push({
-      name: name,
-      submittedAt: submittedAt,
-      responses: responses
-    });
+    var sub = rowToSubmission_(headers, row);
+    if (sub) submissions.push(sub);
   });
 
+  return groupSubmissionsByDate_(submissions);
+}
+
+function rowToSubmission_(headers, row) {
+  var timestamp = row[0];
+  var name = String(row[1] || '').trim();
+  if (!name) return null;
+
+  var responses = {};
+  var col2 = row[2];
+
+  if (isJsonCell_(col2)) {
+    try {
+      responses = JSON.parse(String(col2));
+    } catch (e) {
+      responses = {};
+    }
+  } else {
+    for (var c = 2; c < headers.length; c++) {
+      var header = headers[c];
+      if (!header) continue;
+      var val = row[c];
+      if (val === '' || val === null || val === undefined) continue;
+      responses[header] = String(val).trim();
+    }
+  }
+
+  var submittedAt = timestamp instanceof Date
+    ? timestamp.toISOString()
+    : new Date(timestamp).toISOString();
+
+  if (isNaN(new Date(submittedAt).getTime())) {
+    submittedAt = new Date().toISOString();
+  }
+
+  return {
+    name: name,
+    submittedAt: submittedAt,
+    responses: responses
+  };
+}
+
+function isJsonCell_(val) {
+  if (val === null || val === undefined || val === '') return false;
+  var s = String(val).trim();
+  return s.charAt(0) === '{' || s.charAt(0) === '[';
+}
+
+function groupSubmissionsByDate_(submissions) {
   var byDate = {};
+
   submissions.forEach(function (sub) {
     var dayKey = sub.submittedAt.slice(0, 10);
     if (!byDate[dayKey]) {
@@ -128,8 +194,19 @@ function formatThaiDateLabel_(isoDay) {
   return parseInt(parts[2], 10) + ' ' + m + ' ' + y;
 }
 
-function jsonOut_(obj) {
+/** JSON for same-origin; JSONP when ?callback=... (fixes CORS from GitHub Pages). */
+function respond_(obj, e) {
+  var params = e && e.parameter ? e.parameter : {};
+  var callback = params.callback;
+  var json = JSON.stringify(obj);
+
+  if (callback && /^[A-Za-z_$][\w.$]*$/.test(callback)) {
+    return ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
   return ContentService
-    .createTextOutput(JSON.stringify(obj))
+    .createTextOutput(json)
     .setMimeType(ContentService.MimeType.JSON);
 }

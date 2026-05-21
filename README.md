@@ -27,11 +27,14 @@ Submissions are grouped into **sessions by submission date** (tabs at the top). 
 
 ### Google Apps Script (required for live data)
 
-The site POSTs to a Google Apps Script web app. To enable the dashboard **GET** endpoint:
+The site POSTs to a Google Apps Script web app. The admin dashboard loads data with **JSONP** (required because Apps Script does not send CORS headers to GitHub Pages).
 
-1. Open the script bound to your survey spreadsheet (or create one from `google-apps-script/Code.gs`).
-2. Paste/update code from [`google-apps-script/Code.gs`](google-apps-script/Code.gs).
-3. **Deploy → New deployment → Web app** — execute as **Me**, access **Anyone**.
-4. Copy the `/exec` URL into `GOOGLE_SCRIPT_URL` in `index.html` if it changed.
+1. Open the script **bound to your `stackq` spreadsheet**.
+2. Replace all code with [`google-apps-script/Code.gs`](google-apps-script/Code.gs).
+3. **Deploy → Manage deployments → Edit (pencil) → Version: New version → Deploy.**
+4. Set **Execute as:** Me · **Who has access:** **Anyone** (not “Anyone with Google account”).
+5. If the `/exec` URL changes, update `GOOGLE_SCRIPT_URL` in `index.html`.
 
-The sheet should have columns: `Timestamp | Name | Responses (JSON) | SubmittedAt (optional ISO)`.
+**Sheet format:** row 1 headers `Timestamp | Name | Google Doc | Google Sheet | ...` (one column per app), matching your current sheet.
+
+**CORS note:** Browsers block `fetch()` from `wtatiya.github.io` to `script.google.com`. After deploying `doGet` with the repo code, the site uses JSONP automatically — no CORS header needed.

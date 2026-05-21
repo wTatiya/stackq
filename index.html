@@ -1458,13 +1458,39 @@
                 .sort((a, b) => b.score - a.score);
         };
 
-        const fetchAdminSessions = async (adminKey) => {
-            const url = `${GOOGLE_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}`;
-            const res = await fetch(url);
-            const data = await res.json();
-            if (!data.ok) throw new Error(data.error || 'โหลดข้อมูลไม่สำเร็จ');
-            return data;
-        };
+        /** JSONP avoids CORS — Google Apps Script does not send Access-Control-Allow-Origin to GitHub Pages. */
+        const fetchAdminSessions = (adminKey) => new Promise((resolve, reject) => {
+            const callbackName = `stackqAdmin_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+            const url = `${GOOGLE_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}&callback=${encodeURIComponent(callbackName)}`;
+            let scriptEl = null;
+            const cleanup = () => {
+                clearTimeout(timer);
+                try { delete window[callbackName]; } catch (_) { /* ignore */ }
+                if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+            };
+            const timer = setTimeout(() => {
+                cleanup();
+                reject(new Error('หมดเวลาเชื่อมต่อ — ตรวจสอบการ Deploy Web App (Anyone) และโค้ด doGet'));
+            }, 20000);
+
+            window[callbackName] = (data) => {
+                cleanup();
+                if (!data || !data.ok) {
+                    reject(new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ'));
+                    return;
+                }
+                resolve(data);
+            };
+
+            scriptEl = document.createElement('script');
+            scriptEl.src = url;
+            scriptEl.async = true;
+            scriptEl.onerror = () => {
+                cleanup();
+                reject(new Error('เชื่อมต่อไม่ได้ — ตั้งค่า Web App เป็น "Anyone" แล้ว Deploy เวอร์ชันใหม่'));
+            };
+            document.head.appendChild(scriptEl);
+        });
 
         const ADMIN_BUBBLE_TINTS = [
             'admin-logo-bubble--coral',
@@ -1566,7 +1592,7 @@
                     setError(
                         err.message === 'Unauthorized'
                             ? 'รหัสผ่านไม่ถูกต้อง'
-                            : 'ยังเชื่อมต่อแดชบอร์ดไม่ได้ — ตรวจสอบว่าได้ Deploy Google Apps Script (doGet) แล้ว'
+                            : 'เชื่อมต่อไม่ได้ — ใน Apps Script: วางโค้ดจาก google-apps-script/Code.gs → Deploy → New version → ตั้ง Who has access เป็น Anyone'
                     );
                 } finally {
                     setChecking(false);

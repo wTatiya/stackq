@@ -384,7 +384,8 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            padding-right: 0.15rem;
+            padding-right: 0.2rem;
+            scrollbar-gutter: stable;
         }
         .admin-main {
             display: flex;
@@ -500,6 +501,7 @@
             aspect-ratio: 16 / 9;
             max-height: 100%;
             margin: 0;
+            contain: layout paint;
             border: var(--border-ink);
             border-radius: var(--sketch-radius);
             background-color: var(--paper);
@@ -536,10 +538,23 @@
             border: 2px dashed rgba(50, 50, 50, 0.15);
             pointer-events: none;
         }
-        .admin-logo-bubble {
+        .admin-bubble-slot {
             position: absolute;
             left: 0;
             top: 0;
+            width: 0;
+            height: 0;
+            transform: translate3d(var(--bubble-x, 0px), var(--bubble-y, 0px), 0);
+            transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+            pointer-events: none;
+        }
+        .admin-bubble-slot .admin-logo-bubble {
+            pointer-events: auto;
+        }
+        .admin-logo-bubble {
+            position: relative;
+            transform: translate(-50%, -50%) rotate(var(--bubble-tilt, 0deg));
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -547,10 +562,10 @@
             background: rgba(255, 255, 255, 0.94);
             border: 2.5px solid var(--ink);
             box-shadow: 4px 4px 0 var(--ink);
-            animation: admin-bubble-float 7s ease-in-out infinite;
-            transition: width 0.5s ease, height 0.5s ease, left 0.6s ease, top 0.6s ease,
-                opacity 0.5s ease, filter 0.5s ease, box-shadow 0.2s ease;
-            will-change: left, top, transform;
+            animation: admin-bubble-float 5.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+            transition: width 0.22s ease, height 0.22s ease, opacity 0.25s ease;
+            will-change: transform;
+            backface-visibility: hidden;
         }
         .admin-logo-bubble--coral { background: rgba(255, 235, 235, 0.95); }
         .admin-logo-bubble--lavender { background: rgba(248, 246, 255, 0.95); }
@@ -566,9 +581,12 @@
             background: rgba(255, 107, 107, 0.55);
             border-color: rgba(50, 50, 50, 0.35);
         }
+        .admin-bubble-slot:has(.admin-logo-bubble:hover),
+        .admin-bubble-slot:has(.admin-logo-bubble--focusable:hover) {
+            z-index: 300 !important;
+        }
         .admin-logo-bubble:hover,
         .admin-logo-bubble--focusable:hover {
-            z-index: 300 !important;
             animation-play-state: paused;
             opacity: 1 !important;
             filter: saturate(1) !important;
@@ -637,16 +655,19 @@
             opacity: 1;
         }
         @keyframes admin-bubble-float {
-            0%, 100% { transform: translate(-50%, -50%) rotate(var(--bubble-tilt, 0deg)); }
-            33% { transform: translate(-50%, calc(-50% - 6px)) rotate(calc(var(--bubble-tilt, 0deg) + 2deg)); }
-            66% { transform: translate(-50%, calc(-50% + 5px)) rotate(calc(var(--bubble-tilt, 0deg) - 2deg)); }
+            0%, 100% { transform: translate3d(-50%, -50%, 0) rotate(var(--bubble-tilt, 0deg)); }
+            50% { transform: translate3d(-50%, calc(-50% - 5px), 0) rotate(calc(var(--bubble-tilt, 0deg) + 1.5deg)); }
         }
         @keyframes admin-bubble-float-subtle {
-            0%, 100% { transform: translate(-50%, -50%) rotate(var(--bubble-tilt, 0deg)); }
-            50% { transform: translate(-50%, calc(-50% - 3px)) rotate(var(--bubble-tilt, 0deg)); }
+            0%, 100% { transform: translate3d(-50%, -50%, 0) rotate(var(--bubble-tilt, 0deg)); }
+            50% { transform: translate3d(-50%, calc(-50% - 2px), 0) rotate(var(--bubble-tilt, 0deg)); }
         }
         @media (prefers-reduced-motion: reduce) {
-            .admin-logo-bubble { animation: none; }
+            .admin-bubble-slot { transition: none; }
+            .admin-logo-bubble {
+                animation: none;
+                transform: translate3d(-50%, -50%, 0) rotate(var(--bubble-tilt, 0deg));
+            }
         }
         .admin-empty {
             position: absolute;
@@ -714,6 +735,7 @@
                 height: auto;
                 max-height: none;
                 overflow: auto;
+                scrollbar-gutter: stable;
             }
             .admin-dashboard-shell {
                 grid-template-columns: 1fr;
@@ -1230,6 +1252,48 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* Hand-drawn scrollbars — Firefox + Chromium/Safari */
+        .doodle-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: var(--yellow-badge) var(--paper-warm);
+        }
+        .doodle-scrollbar::-webkit-scrollbar {
+            width: 11px;
+        }
+        .doodle-scrollbar::-webkit-scrollbar-track {
+            margin: 4px 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent,
+                transparent 5px,
+                rgba(50, 50, 50, 0.06) 5px,
+                rgba(50, 50, 50, 0.06) 6px
+            );
+            border-left: 2px dashed rgba(50, 50, 50, 0.2);
+            border-radius: var(--sketch-radius-sm);
+        }
+        .doodle-scrollbar::-webkit-scrollbar-thumb {
+            min-height: 2.5rem;
+            background: linear-gradient(180deg, var(--yellow) 0%, var(--yellow-badge) 100%);
+            border: 2px solid var(--ink);
+            border-radius: 14px 5px 16px 6px / 6px 14px 5px 16px;
+            box-shadow: 2px 2px 0 rgba(50, 50, 50, 0.45);
+        }
+        .doodle-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--yellow-badge) 0%, #ffd84d 100%);
+            box-shadow: 3px 3px 0 var(--ink);
+        }
+        .doodle-scrollbar::-webkit-scrollbar-thumb:active {
+            background: var(--coral-light);
+            box-shadow: 1px 1px 0 var(--ink);
+        }
+        .doodle-scrollbar::-webkit-scrollbar-button,
+        .doodle-scrollbar::-webkit-scrollbar-corner {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
         .spinner {
             border: 3px solid rgba(255, 255, 255, 0.35);
             border-radius: 50%;
@@ -1527,6 +1591,7 @@
         const ADMIN_PASSWORD = 'somdej2445';
         const ADMIN_SESSION_KEY = 'stackq_admin_auth';
         const ADMIN_POLL_MS = 5000;
+        const ADMIN_CLOUD_MIN_SCORE = 1;
         const SURVEY_PUBLIC_URL = 'https://wtatiya.github.io/stackq/';
         const SURVEY_QR_IMAGE = 'assets/qrcode-survey.png';
         const ORG_LABEL = 'ฝ่ายการพยาบาล โรงพยาบาลสมเด็จพระบรมราชเทวี ณ ศรีราชา';
@@ -1580,8 +1645,8 @@
                 });
             });
             return Object.entries(totals)
-                .map(([name, score]) => ({ ...APP_REGISTRY[name], score }))
-                .filter((item) => item.score > 0)
+                .map(([name, score]) => ({ ...APP_REGISTRY[name], score: Number(score) || 0 }))
+                .filter((item) => item.score >= ADMIN_CLOUD_MIN_SCORE)
                 .sort((a, b) => b.score - a.score);
         };
 
@@ -1716,56 +1781,137 @@
             return (h % 360) * (Math.PI / 180);
         };
 
-        const bubblesOverlap = (a, b, gapPct) => {
-            const dx = a.left - b.left;
-            const dy = a.top - b.top;
-            return Math.hypot(dx, dy) < a.rPct + b.rPct + gapPct;
+        const bubbleHitRadiusPx = (sizePx) => sizePx / 2 + 12;
+
+        const bubbleCenterPx = (bubble, stageW, stageH) => ({
+            x: (bubble.left / 100) * stageW,
+            y: (bubble.top / 100) * stageH
+        });
+
+        const bubblesOverlapPx = (a, b, gapPx, stageW, stageH) => {
+            const ac = bubbleCenterPx(a, stageW, stageH);
+            const bc = bubbleCenterPx(b, stageW, stageH);
+            const minDist = bubbleHitRadiusPx(a.sizePx) + bubbleHitRadiusPx(b.sizePx) + gapPx;
+            return Math.hypot(ac.x - bc.x, ac.y - bc.y) < minDist;
+        };
+
+        const clampBubbleCenter = (left, top, sizePx, stageW, stageH) => {
+            const padX = ((bubbleHitRadiusPx(sizePx) + 4) / stageW) * 100;
+            const padY = ((bubbleHitRadiusPx(sizePx) + 4) / stageH) * 100;
+            return {
+                left: Math.max(padX, Math.min(100 - padX, left)),
+                top: Math.max(padY, Math.min(100 - padY, top))
+            };
+        };
+
+        const resolveBubbleOverlaps = (placed, stageW, stageH) => {
+            const gapPx = 10;
+            const maxIter = 48;
+            for (let iter = 0; iter < maxIter; iter++) {
+                let moved = false;
+                for (let i = 0; i < placed.length; i++) {
+                    for (let j = i + 1; j < placed.length; j++) {
+                        const a = placed[i];
+                        const b = placed[j];
+                        const ac = bubbleCenterPx(a, stageW, stageH);
+                        const bc = bubbleCenterPx(b, stageW, stageH);
+                        const ra = bubbleHitRadiusPx(a.sizePx);
+                        const rb = bubbleHitRadiusPx(b.sizePx);
+                        const dx = bc.x - ac.x;
+                        const dy = bc.y - ac.y;
+                        let dist = Math.hypot(dx, dy);
+                        const minDist = ra + rb + gapPx;
+                        if (dist >= minDist) continue;
+                        if (dist < 0.5) dist = 0.5;
+                        const overlap = minDist - dist;
+                        const ux = dx / dist;
+                        const uy = dy / dist;
+                        const aWeight = a.score <= b.score ? 1 : 0.3;
+                        const bWeight = b.score <= a.score ? 1 : 0.3;
+                        const total = aWeight + bWeight;
+                        const pushA = (overlap * aWeight) / total;
+                        const pushB = (overlap * bWeight) / total;
+                        const nextA = clampBubbleCenter(
+                            a.left - (pushA * ux / stageW) * 100,
+                            a.top - (pushA * uy / stageH) * 100,
+                            a.sizePx,
+                            stageW,
+                            stageH
+                        );
+                        const nextB = clampBubbleCenter(
+                            b.left + (pushB * ux / stageW) * 100,
+                            b.top + (pushB * uy / stageH) * 100,
+                            b.sizePx,
+                            stageW,
+                            stageH
+                        );
+                        if (nextA.left !== a.left || nextA.top !== a.top) {
+                            a.left = nextA.left;
+                            a.top = nextA.top;
+                            moved = true;
+                        }
+                        if (nextB.left !== b.left || nextB.top !== b.top) {
+                            b.left = nextB.left;
+                            b.top = nextB.top;
+                            moved = true;
+                        }
+                    }
+                }
+                if (!moved) break;
+            }
+            return placed;
         };
 
         const computeBubbleLayout = (items, stageW, stageH) => {
             const maxScore = Math.max(...items.map((i) => i.score), 1);
-            const minDim = Math.min(stageW, stageH) || 500;
             const count = items.length;
             const sizeScale = Math.min(1, 38 / Math.sqrt(Math.max(count, 1)));
             const golden = Math.PI * (3 - Math.sqrt(5));
+            const gapPx = 12;
             const placed = [];
 
-            const sorted = [...items].sort((a, b) => a.score - b.score);
+            const sorted = [...items].sort((a, b) => b.score - a.score);
 
             sorted.forEach((item, rank) => {
                 const norm = item.score / maxScore;
                 const sizePx = Math.round((34 + norm * 58) * sizeScale);
-                const rPct = (sizePx / minDim) * 50;
-                const baseRing = 12 + (1 - norm) * 30;
+                const baseRing = 8 + (1 - norm) * 28;
                 const seed = bubbleSeedAngle(item.id);
-                const gap = 2.2 + (1 - norm) * 0.8;
 
                 let chosen = null;
 
-                for (let attempt = 0; attempt < 140; attempt++) {
-                    const ring = baseRing + attempt * 0.38;
-                    const angle = seed + rank * golden + attempt * 0.31;
+                for (let attempt = 0; attempt < 320; attempt++) {
+                    const ring = baseRing + attempt * 0.42;
+                    const angle = seed + rank * golden + attempt * 0.27;
                     const cx = 50 + Math.cos(angle) * ring;
                     const cy = 50 + Math.sin(angle) * ring * 0.88;
-                    const left = Math.max(6 + rPct, Math.min(94 - rPct, cx));
-                    const top = Math.max(8 + rPct, Math.min(92 - rPct, cy));
-                    const candidate = { left, top, sizePx, rPct };
+                    const clamped = clampBubbleCenter(cx, cy, sizePx, stageW, stageH);
+                    const candidate = { left: clamped.left, top: clamped.top, sizePx };
 
-                    if (!placed.some((p) => bubblesOverlap(candidate, p, gap))) {
+                    if (!placed.some((p) => bubblesOverlapPx(candidate, p, gapPx, stageW, stageH))) {
                         chosen = candidate;
                         break;
                     }
                 }
 
                 if (!chosen) {
-                    const fallbackRing = 38 + (rank % 10) * 1.5;
-                    const angle = seed + rank * 0.7;
-                    chosen = {
-                        left: Math.max(10, Math.min(90, 50 + Math.cos(angle) * fallbackRing)),
-                        top: Math.max(12, Math.min(88, 50 + Math.sin(angle) * fallbackRing * 0.88)),
-                        sizePx,
-                        rPct
-                    };
+                    for (let attempt = 0; attempt < 320; attempt++) {
+                        const ring = 32 + attempt * 0.55;
+                        const angle = seed + rank * 0.61 + attempt * 0.19;
+                        const cx = 50 + Math.cos(angle) * ring;
+                        const cy = 50 + Math.sin(angle) * ring * 0.88;
+                        const clamped = clampBubbleCenter(cx, cy, sizePx, stageW, stageH);
+                        const candidate = { left: clamped.left, top: clamped.top, sizePx };
+                        if (!placed.some((p) => bubblesOverlapPx(candidate, p, gapPx, stageW, stageH))) {
+                            chosen = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                if (!chosen) {
+                    const clamped = clampBubbleCenter(50, 50, sizePx, stageW, stageH);
+                    chosen = { left: clamped.left, top: clamped.top, sizePx };
                 }
 
                 const opacity = 0.26 + norm * 0.74;
@@ -1794,39 +1940,84 @@
                 });
             });
 
-            return placed.sort((a, b) => a.zIndex - b.zIndex);
+            return resolveBubbleOverlaps(placed, stageW, stageH)
+                .map((b) => ({
+                    ...b,
+                    xPx: (b.left / 100) * stageW,
+                    yPx: (b.top / 100) * stageH
+                }))
+                .sort((a, b) => a.zIndex - b.zIndex);
         };
 
         const LogoBubbleCloud = ({ items }) => {
             const stageRef = React.useRef(null);
+            const layoutCacheRef = React.useRef('');
             const [layout, setLayout] = React.useState([]);
             const [hiddenCount, setHiddenCount] = React.useState(0);
+            const visibleItems = React.useMemo(
+                () => items.filter((item) => Number(item.score) >= ADMIN_CLOUD_MIN_SCORE),
+                [items]
+            );
+            const displayItems = React.useMemo(
+                () => (visibleItems.length > ADMIN_CLOUD_MAX_BUBBLES
+                    ? visibleItems.slice(0, ADMIN_CLOUD_MAX_BUBBLES)
+                    : visibleItems),
+                [visibleItems]
+            );
+            const layoutInputKey = React.useMemo(
+                () => displayItems.map((item) => `${item.id}:${item.score}`).join('|'),
+                [displayItems]
+            );
 
             React.useEffect(() => {
                 const el = stageRef.current;
-                if (!items.length) {
+                if (!displayItems.length) {
+                    layoutCacheRef.current = '';
                     setLayout([]);
                     setHiddenCount(0);
-                    return;
+                    return undefined;
                 }
 
+                setHiddenCount(Math.max(0, visibleItems.length - displayItems.length));
+
+                let rafId = 0;
+                let resizeTimer = 0;
+
                 const runLayout = () => {
-                    const rect = el ? el.getBoundingClientRect() : { width: 900, height: 506 };
-                    const display = items.length > ADMIN_CLOUD_MAX_BUBBLES
-                        ? items.slice(0, ADMIN_CLOUD_MAX_BUBBLES)
-                        : items;
-                    setHiddenCount(Math.max(0, items.length - display.length));
-                    setLayout(computeBubbleLayout(display, rect.width, rect.height));
+                    cancelAnimationFrame(rafId);
+                    rafId = requestAnimationFrame(() => {
+                        const rect = el ? el.getBoundingClientRect() : { width: 900, height: 506 };
+                        const stageW = Math.round(rect.width);
+                        const stageH = Math.round(rect.height);
+                        if (stageW < 20 || stageH < 20) return;
+
+                        const cacheKey = `${layoutInputKey}@${stageW}x${stageH}`;
+                        if (layoutCacheRef.current === cacheKey) return;
+                        layoutCacheRef.current = cacheKey;
+                        setLayout(computeBubbleLayout(displayItems, stageW, stageH));
+                    });
                 };
 
                 runLayout();
-                if (!el || typeof ResizeObserver === 'undefined') return undefined;
-                const ro = new ResizeObserver(runLayout);
-                ro.observe(el);
-                return () => ro.disconnect();
-            }, [items]);
 
-            if (!items.length) {
+                if (!el || typeof ResizeObserver === 'undefined') {
+                    return () => cancelAnimationFrame(rafId);
+                }
+
+                const ro = new ResizeObserver(() => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(runLayout, 120);
+                });
+                ro.observe(el);
+
+                return () => {
+                    cancelAnimationFrame(rafId);
+                    clearTimeout(resizeTimer);
+                    ro.disconnect();
+                };
+            }, [displayItems, layoutInputKey, visibleItems.length]);
+
+            if (!visibleItems.length) {
                 return (
                     <div className="admin-bubble-stage">
                         <div className="admin-empty">
@@ -1851,29 +2042,35 @@
                     {layout.map((bubble) => (
                         <div
                             key={bubble.name}
-                            className={`admin-logo-bubble ${bubble.tint}${bubble.faded ? ' admin-logo-bubble--faded' : ''}${bubble.focusable ? ' admin-logo-bubble--focusable' : ''}`}
+                            className="admin-bubble-slot"
                             style={{
-                                left: `${bubble.left}%`,
-                                top: `${bubble.top}%`,
-                                width: bubble.sizePx,
-                                height: bubble.sizePx,
-                                zIndex: bubble.zIndex,
-                                opacity: bubble.opacity,
-                                filter: `saturate(${bubble.saturation})`,
-                                animationDelay: `${bubble.delay}s`,
-                                animationDuration: `${bubble.duration}s`,
-                                '--bubble-tilt': `${bubble.tilt}deg`
+                                '--bubble-x': `${bubble.xPx}px`,
+                                '--bubble-y': `${bubble.yPx}px`,
+                                zIndex: bubble.zIndex
                             }}
-                            title={`${bubble.name}: ${bubble.score} คะแนน`}
                         >
-                            <span className="admin-bubble-tooltip">{bubble.name}</span>
-                            <AppLogo id={bubble.id} slug={bubble.slug} name={bubble.name} />
-                            <span
-                                className="admin-logo-bubble-score"
-                                style={{ opacity: 0.45 + bubble.norm * 0.55 }}
+                            <div
+                                className={`admin-logo-bubble ${bubble.tint}${bubble.faded ? ' admin-logo-bubble--faded' : ''}${bubble.focusable ? ' admin-logo-bubble--focusable' : ''}`}
+                                style={{
+                                    width: bubble.sizePx,
+                                    height: bubble.sizePx,
+                                    opacity: bubble.opacity,
+                                    filter: `saturate(${bubble.saturation})`,
+                                    animationDelay: `${bubble.delay}s`,
+                                    animationDuration: `${bubble.duration}s`,
+                                    '--bubble-tilt': `${bubble.tilt}deg`
+                                }}
+                                title={`${bubble.name}: ${bubble.score} คะแนน`}
                             >
-                                {bubble.score}
-                            </span>
+                                <span className="admin-bubble-tooltip">{bubble.name}</span>
+                                <AppLogo id={bubble.id} slug={bubble.slug} name={bubble.name} />
+                                <span
+                                    className="admin-logo-bubble-score"
+                                    style={{ opacity: 0.45 + bubble.norm * 0.55 }}
+                                >
+                                    {bubble.score}
+                                </span>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -2014,7 +2211,7 @@
             );
 
             return (
-                <div className="admin-page admin-page--dashboard relative z-[1]">
+                <div className="admin-page admin-page--dashboard doodle-scrollbar relative z-[1]">
                     <DoodleDecorations />
                     <header className="admin-header admin-header--minimal">
                         <button
@@ -2040,7 +2237,7 @@
                         <div className="admin-dashboard-shell">
                             <aside className="admin-sidebar doodle-card">
                                 <div className="admin-sidebar-section">
-                                    <div className="admin-sidebar-scroll">
+                                    <div className="admin-sidebar-scroll doodle-scrollbar">
                                         <div className="admin-session-tabs" role="tablist" aria-label="รอบตามวันที่ส่ง">
                                             {sessions.length === 0 ? (
                                                 <span className="doodle-subtitle text-sm">ยังไม่มีข้อมูลที่ส่ง</span>

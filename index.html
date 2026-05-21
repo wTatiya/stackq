@@ -1583,27 +1583,23 @@
         });
 
         const ADMIN_AUDIO_MUTE_KEY = 'stackq_admin_mute';
+        const ADMIN_BG_MUSIC = 'assets/Background Music/bg.mp3';
         const ADMIN_SFX_NEW_SUBMISSION = 'assets/Sound Effect/bubble.mp3';
 
-        /** Looping ambient music (Web Audio) + new-submission SFX (bubble.mp3). */
+        /** Looping background music (bg.mp3) + new-submission SFX (bubble.mp3). */
         const createAdminAudio = () => {
-            let ctx = null;
-            let musicGain = null;
-            let musicSource = null;
+            let bgMusic = null;
             let submissionSfx = null;
             let muted = localStorage.getItem(ADMIN_AUDIO_MUTE_KEY) === '1';
             const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            const getCtx = () => {
-                if (!ctx) {
-                    const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (!Ctx) return null;
-                    ctx = new Ctx();
-                    musicGain = ctx.createGain();
-                    musicGain.connect(ctx.destination);
-                    applyVolumes();
+            const getBgMusic = () => {
+                if (!bgMusic) {
+                    bgMusic = new Audio(ADMIN_BG_MUSIC);
+                    bgMusic.preload = 'auto';
+                    bgMusic.loop = true;
                 }
-                return ctx;
+                return bgMusic;
             };
 
             const getSubmissionSfx = () => {
@@ -1615,65 +1611,27 @@
             };
 
             const applyVolumes = () => {
-                if (!musicGain) return;
                 const off = muted || reducedMotion;
-                musicGain.gain.value = off ? 0 : 0.18;
+                if (bgMusic) bgMusic.volume = off ? 0 : 0.35;
             };
 
             const unlock = async () => {
-                const c = getCtx();
-                if (c && c.state === 'suspended') await c.resume();
+                getBgMusic().load();
                 getSubmissionSfx().load();
-                return !c || c.state === 'running';
-            };
-
-            const buildAmbientLoop = (c) => {
-                const loopSec = 16;
-                const sampleRate = c.sampleRate;
-                const length = Math.floor(sampleRate * loopSec);
-                const buffer = c.createBuffer(2, length, sampleRate);
-                const chord = [261.63, 329.63, 392, 523.25, 440, 349.23];
-                for (let ch = 0; ch < 2; ch++) {
-                    const data = buffer.getChannelData(ch);
-                    for (let i = 0; i < length; i++) {
-                        const t = i / sampleRate;
-                        let sample = 0;
-                        chord.forEach((freq, ni) => {
-                            const start = ni * 2.4;
-                            const dur = 2.1;
-                            if (t >= start && t < start + dur) {
-                                const local = t - start;
-                                const env = Math.sin((Math.PI * local) / dur);
-                                sample += Math.sin(2 * Math.PI * freq * local) * env * 0.07;
-                            }
-                        });
-                        data[i] = sample;
-                    }
-                }
-                return buffer;
+                return true;
             };
 
             const stopMusic = () => {
-                if (musicSource) {
-                    try { musicSource.stop(); } catch (_) { /* already stopped */ }
-                    try { musicSource.disconnect(); } catch (_) { /* ignore */ }
-                    musicSource = null;
-                }
+                if (!bgMusic) return;
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
             };
 
             const startMusic = () => {
                 if (muted || reducedMotion) return;
-                const c = getCtx();
-                if (!c) return;
-                stopMusic();
-                const buffer = buildAmbientLoop(c);
-                musicSource = c.createBufferSource();
-                musicSource.buffer = buffer;
-                musicSource.loop = true;
-                musicSource.connect(musicGain);
-                try {
-                    musicSource.start(0);
-                } catch (_) { /* ignore */ }
+                const music = getBgMusic();
+                applyVolumes();
+                music.play().catch(() => { /* autoplay blocked until user gesture */ });
             };
 
             const playNewSubmission = () => {
@@ -1687,9 +1645,11 @@
             const setMuted = (next) => {
                 muted = next;
                 localStorage.setItem(ADMIN_AUDIO_MUTE_KEY, muted ? '1' : '0');
-                applyVolumes();
                 if (muted) stopMusic();
-                else startMusic();
+                else {
+                    applyVolumes();
+                    startMusic();
+                }
             };
 
             return {
@@ -1699,7 +1659,7 @@
                 playNewSubmission,
                 setMuted,
                 isMuted: () => muted,
-                isMusicPlaying: () => !!musicSource
+                isMusicPlaying: () => !!bgMusic && !bgMusic.paused
             };
         };
 

@@ -521,6 +521,8 @@
             contain: layout paint;
             overflow: hidden;
             background: transparent;
+            -webkit-clip-path: url(#stackqBubbleClip);
+            clip-path: url(#stackqBubbleClip);
         }
         .admin-stage-badge {
             position: absolute;
@@ -1787,6 +1789,8 @@
             + ' Q 196,28.67 186,43.33 Q 196,58 186,72.67 Q 196,87.33 186,102 Q 196,116.67 186,131.33 Q 196,146 186,160.67 Q 196,175.33 186,186'
             + ' Q 175.33,196 160.67,186 Q 146,196 131.33,186 Q 116.67,196 102,186 Q 87.33,196 72.67,186 Q 58,196 43.33,186 Q 28.67,196 14,186'
             + ' Q 4,175.33 14,160.67 Q 4,146 14,131.33 Q 4,116.67 14,102 Q 4,87.33 14,72.67 Q 4,58 14,43.33 Q 4,28.67 14,14 Z';
+        const BUBBLE_FRAME_EDGE_INSET_PCT = 15;
+        const BUBBLE_FLOAT_PAD_PX = 8;
 
         const BubbleStageFrame = ({ stageRef, ariaLabel, children }) => (
             <div className="admin-bubble-frame">
@@ -1796,6 +1800,11 @@
                     preserveAspectRatio="none"
                     aria-hidden="true"
                 >
+                    <defs>
+                        <clipPath id="stackqBubbleClip" clipPathUnits="objectBoundingBox">
+                            <path d={BUBBLE_FRAME_SCALLOP_PATH} transform="scale(0.005)" />
+                        </clipPath>
+                    </defs>
                     <path
                         d={BUBBLE_FRAME_SCALLOP_PATH}
                         fill="var(--bubble-pink)"
@@ -1816,7 +1825,13 @@
             return (h % 360) * (Math.PI / 180);
         };
 
-        const bubbleHitRadiusPx = (sizePx) => sizePx / 2 + 12;
+        const bubbleHitRadiusPx = (sizePx) => sizePx / 2 + 12 + BUBBLE_FLOAT_PAD_PX;
+
+        const bubbleMaxRingPct = (sizePx, stageW, stageH) => {
+            const padX = ((bubbleHitRadiusPx(sizePx) + 4) / stageW) * 100 + BUBBLE_FRAME_EDGE_INSET_PCT;
+            const padY = ((bubbleHitRadiusPx(sizePx) + 4) / stageH) * 100 + BUBBLE_FRAME_EDGE_INSET_PCT;
+            return Math.max(4, Math.min(50 - padX, 50 - padY));
+        };
 
         const bubbleCenterPx = (bubble, stageW, stageH) => ({
             x: (bubble.left / 100) * stageW,
@@ -1831,8 +1846,8 @@
         };
 
         const clampBubbleCenter = (left, top, sizePx, stageW, stageH) => {
-            const padX = ((bubbleHitRadiusPx(sizePx) + 4) / stageW) * 100;
-            const padY = ((bubbleHitRadiusPx(sizePx) + 4) / stageH) * 100;
+            const padX = ((bubbleHitRadiusPx(sizePx) + 4) / stageW) * 100 + BUBBLE_FRAME_EDGE_INSET_PCT;
+            const padY = ((bubbleHitRadiusPx(sizePx) + 4) / stageH) * 100 + BUBBLE_FRAME_EDGE_INSET_PCT;
             return {
                 left: Math.max(padX, Math.min(100 - padX, left)),
                 top: Math.max(padY, Math.min(100 - padY, top))
@@ -1910,13 +1925,14 @@
             sorted.forEach((item, rank) => {
                 const norm = item.score / maxScore;
                 const sizePx = Math.round((34 + norm * 58) * sizeScale);
-                const baseRing = 8 + (1 - norm) * 28;
+                const maxRing = bubbleMaxRingPct(sizePx, stageW, stageH);
+                const baseRing = Math.min(6 + (1 - norm) * 22, maxRing);
                 const seed = bubbleSeedAngle(item.id);
 
                 let chosen = null;
 
                 for (let attempt = 0; attempt < 320; attempt++) {
-                    const ring = baseRing + attempt * 0.42;
+                    const ring = Math.min(baseRing + attempt * 0.38, maxRing);
                     const angle = seed + rank * golden + attempt * 0.27;
                     const cx = 50 + Math.cos(angle) * ring;
                     const cy = 50 + Math.sin(angle) * ring * 0.88;
@@ -1931,7 +1947,7 @@
 
                 if (!chosen) {
                     for (let attempt = 0; attempt < 320; attempt++) {
-                        const ring = 32 + attempt * 0.55;
+                        const ring = Math.min(maxRing * 0.85 + attempt * 0.35, maxRing);
                         const angle = seed + rank * 0.61 + attempt * 0.19;
                         const cx = 50 + Math.cos(angle) * ring;
                         const cy = 50 + Math.sin(angle) * ring * 0.88;
@@ -1976,11 +1992,16 @@
             });
 
             return resolveBubbleOverlaps(placed, stageW, stageH)
-                .map((b) => ({
-                    ...b,
-                    xPx: (b.left / 100) * stageW,
-                    yPx: (b.top / 100) * stageH
-                }))
+                .map((b) => {
+                    const clamped = clampBubbleCenter(b.left, b.top, b.sizePx, stageW, stageH);
+                    return {
+                        ...b,
+                        left: clamped.left,
+                        top: clamped.top,
+                        xPx: (clamped.left / 100) * stageW,
+                        yPx: (clamped.top / 100) * stageH
+                    };
+                })
                 .sort((a, b) => a.zIndex - b.zIndex);
         };
 

@@ -1457,6 +1457,41 @@
                 ]
             },
             {
+                id: 'browser',
+                title: 'Browser',
+                apps: [
+                    { id: 'edge', name: 'Microsoft Edge', slug: 'microsoftedge' },
+                    { id: 'chrome', name: 'Google Chrome', slug: 'googlechrome' },
+                    { id: 'safari', name: 'Safari', slug: 'safari' },
+                    { id: 'firefox', name: 'Firefox', slug: 'firefox' },
+                    { id: 'opera', name: 'Opera', slug: 'opera' },
+                    { id: 'brave', name: 'Brave', slug: 'brave' },
+                    { id: 'vivaldi', name: 'Vivaldi', slug: 'vivaldi' },
+                    { id: 'tor', name: 'Tor', slug: 'torbrowser' },
+                    { id: 'arc', name: 'Arc', slug: 'arc' },
+                    { id: 'duckduckgo', name: 'DuckDuckGo', slug: 'duckduckgo' },
+                    { id: 'mullvad_browser', name: 'Mullvad', slug: 'mullvad' },
+                    { id: 'floorp', name: 'Floorp', slug: 'floorp' },
+                    { id: 'helium', name: 'Helium', slug: 'helium' },
+                    { id: 'librewolf', name: 'LibreWolf', slug: 'librewolf' },
+                    { id: 'waterfox', name: 'Waterfox', slug: 'waterfox' }
+                ]
+            },
+            {
+                id: 'cybersecurity',
+                title: 'Cybersecurity',
+                apps: [
+                    { id: 'vpn', name: 'VPN (NordVPN, ExpressVPN, Mullvad, etc.)', slug: 'nordvpn' },
+                    { id: 'gpass', name: 'Google Password Manager', slug: 'googlepasswordmanager' },
+                    { id: 'mpass', name: 'Microsoft Password Manager', slug: 'microsoft' },
+                    { id: 'bitwarden', name: 'Bitwarden', slug: 'bitwarden' },
+                    { id: 'gauth', name: 'Google Authenticator', slug: 'googleauthenticator' },
+                    { id: 'mauth', name: 'Microsoft Authenticator', slug: 'microsoftauthenticator' },
+                    { id: 'bitwarden_auth', name: 'Bitwarden Authenticator', slug: 'bitwarden' },
+                    { id: 'antivirus', name: 'Antivirus Software (Bitdefender, Norton, etc.)', slug: 'bitdefender' }
+                ]
+            },
+            {
                 id: 'programming',
                 questionType: 'know',
                 title: 'ความคุ้นเคยกับภาษาโปรแกรม (Programming Languages)',
@@ -1476,9 +1511,6 @@
                 id: 'others',
                 title: 'เครื่องมืออื่นๆ (Other Tools)',
                 apps: [
-                    { id: 'gpass', name: 'Google Password Manager', slug: 'googlepasswordmanager' },
-                    { id: 'gauth', name: 'Google Authenticator', slug: 'googleauthenticator' },
-                    { id: 'mauth', name: 'Microsoft Authenticator', slug: 'microsoftauthenticator' },
                     { id: 'gfonts', name: 'Google Fonts', slug: 'googlefonts' },
                     { id: 'producthunt', name: 'Product Hunt', slug: 'producthunt' },
                     { id: 'unsplash', name: 'Unsplash', slug: 'unsplash' },
@@ -2123,7 +2155,7 @@
             copilot: ICONIFY('microsoft-icon'),
             deepseek: ICONIFY('deepseek-icon'),
             grok: ICONIFY('grok'),
-            kimi: ICONIFY('moonshot-ai'),
+            kimi: 'assets/logos/kimi.png',
             okara: FAVICON('okara.ai'),
             jotform: FAVICON('jotform.com'),
             tally: FAVICON('tally.so'),
@@ -2155,11 +2187,19 @@
             azure: ICONIFY('microsoft-azure'),
             weebly: ICONIFY('weebly'),
             codepen: ICONIFY('codepen-icon'),
-            gpass: FAVICON('passwords.google.com'),
-            mauth: ICONIFY('microsoft-icon'),
+            gpass: 'assets/logos/gpass.png',
+            gauth: 'assets/logos/gauth.png',
+            mauth: 'assets/logos/mauth.png',
+            mpass: FAVICON('account.microsoft.com'),
+            bitwarden: FAVICON('bitwarden.com'),
+            bitwarden_auth: FAVICON('bitwarden.com'),
+            arc: FAVICON('arc.net'),
+            floorp: FAVICON('floorp.app'),
+            helium: FAVICON('helium.computer'),
             java: ICONIFY('java'),
             cpp: 'https://cdn.simpleicons.org/cplusplus',
-            csharp: 'https://cdn.simpleicons.org/csharp',
+            codesandbox: 'assets/logos/codesandbox.png',
+            csharp: 'assets/logos/csharp.png',
             sql: 'https://cdn.simpleicons.org/mysql',
             htmlcss: 'https://cdn.simpleicons.org/html5',
         };

@@ -521,7 +521,7 @@
             inset: 0;
             contain: layout paint;
             overflow: hidden;
-            background: transparent;
+            background: var(--bubble-pink);
             -webkit-clip-path: url(#stackqBubbleClip);
             clip-path: url(#stackqBubbleClip);
         }
@@ -1773,7 +1773,7 @@
             'admin-logo-bubble--mint',
             'admin-logo-bubble--yellow'
         ];
-        const ADMIN_CLOUD_MAX_BUBBLES = 48;
+        const ADMIN_CLOUD_MAX_BUBBLES = 36;
 
         const BUBBLE_FRAME_SCALLOP_PATH =
             'M 14,14 Q 28.67,4 43.33,14 Q 58,4 72.67,14 Q 87.33,4 102,14 Q 116.67,4 131.33,14 Q 146,4 160.67,14 Q 175.33,4 186,14'
@@ -1782,7 +1782,7 @@
             + ' Q 4,175.33 14,160.67 Q 4,146 14,131.33 Q 4,116.67 14,102 Q 4,87.33 14,72.67 Q 4,58 14,43.33 Q 4,28.67 14,14 Z';
         const BUBBLE_FRAME_EDGE_INSET_PCT = 12;
         const BUBBLE_FLOAT_PAD_PX = 8;
-        const BUBBLE_LAYOUT_GAP_PX = 20;
+        const BUBBLE_LAYOUT_GAP_PX = 10;
 
         const BubbleStageFrame = ({ stageRef, ariaLabel, children }) => (
             <div className="admin-bubble-frame">
@@ -1871,11 +1871,8 @@
                         const overlap = minDist - dist;
                         const ux = dx / dist;
                         const uy = dy / dist;
-                        const aWeight = a.score >= b.score ? 0.35 : 0.65;
-                        const bWeight = b.score >= a.score ? 0.35 : 0.65;
-                        const total = aWeight + bWeight;
-                        const pushA = (overlap * aWeight) / total;
-                        const pushB = (overlap * bWeight) / total;
+                        const pushA = overlap / 2;
+                        const pushB = overlap / 2;
                         const nextA = clampBubbleCenter(
                             a.left - (pushA * ux / stageW) * 100,
                             a.top - (pushA * uy / stageH) * 100,
@@ -1908,9 +1905,66 @@
             return anyMoved;
         };
 
-        const relaxBubbleLayout = (placed, stageW, stageH) => {
-            for (let pass = 0; pass < 96; pass++) {
-                if (!resolveBubbleOverlaps(placed, stageW, stageH)) break;
+        const simulateBubbleCloud = (placed, stageW, stageH) => {
+            const gap = BUBBLE_LAYOUT_GAP_PX;
+            const cx = stageW / 2;
+            const cy = stageH / 2;
+            for (let step = 0; step < 180; step++) {
+                const forces = placed.map(() => ({ x: 0, y: 0 }));
+                let maxPush = 0;
+                for (let i = 0; i < placed.length; i++) {
+                    for (let j = i + 1; j < placed.length; j++) {
+                        const a = placed[i];
+                        const b = placed[j];
+                        const ac = bubbleCenterPx(a, stageW, stageH);
+                        const bc = bubbleCenterPx(b, stageW, stageH);
+                        const minDist = bubbleLayoutRadiusPx(a.sizePx) + bubbleLayoutRadiusPx(b.sizePx) + gap;
+                        const dx = bc.x - ac.x;
+                        const dy = bc.y - ac.y;
+                        let dist = Math.hypot(dx, dy);
+                        if (dist < 0.001) dist = 0.001;
+                        if (dist >= minDist) continue;
+                        const push = ((minDist - dist) / dist) * 0.62;
+                        maxPush = Math.max(maxPush, push);
+                        forces[i].x -= dx * push;
+                        forces[i].y -= dy * push;
+                        forces[j].x += dx * push;
+                        forces[j].y += dy * push;
+                    }
+                    const ac = bubbleCenterPx(placed[i], stageW, stageH);
+                    const pull = 0.018 * (placed[i].norm || 0.5);
+                    forces[i].x += (cx - ac.x) * pull;
+                    forces[i].y += (cy - ac.y) * pull;
+                }
+                if (maxPush < 0.02) break;
+                placed.forEach((b, i) => {
+                    const next = clampBubbleCenter(
+                        b.left + (forces[i].x / stageW) * 100,
+                        b.top + (forces[i].y / stageH) * 100,
+                        b.sizePx,
+                        stageW,
+                        stageH
+                    );
+                    b.left = next.left;
+                    b.top = next.top;
+                });
+            }
+            return placed;
+        };
+
+        const shrinkBubblesUntilClear = (placed, stageW, stageH) => {
+            for (let round = 0; round < 8; round++) {
+                simulateBubbleCloud(placed, stageW, stageH);
+                resolveBubbleOverlaps(placed, stageW, stageH);
+                const hasOverlap = placed.some((a, i) =>
+                    placed.slice(i + 1).some((b) =>
+                        bubblesOverlapPx(a, b, BUBBLE_LAYOUT_GAP_PX, stageW, stageH)
+                    )
+                );
+                if (!hasOverlap) break;
+                placed.forEach((b) => {
+                    b.sizePx = Math.max(22, Math.round(b.sizePx * 0.94));
+                });
             }
             return placed;
         };
@@ -1918,13 +1972,14 @@
         const computeBubbleLayout = (items, stageW, stageH) => {
             const maxScore = Math.max(...items.map((i) => i.score), 1);
             const count = items.length;
-            const sizeScale = Math.min(0.88, 52 / (count + 12));
+            const sizeScale = Math.min(0.58, 34 / Math.sqrt(Math.max(count, 1)));
+            const layoutGap = Math.max(8, Math.min(BUBBLE_LAYOUT_GAP_PX, 22 - count * 0.2));
             const golden = Math.PI * (3 - Math.sqrt(5));
             const sorted = [...items].sort((a, b) => b.score - a.score);
 
             const sizes = sorted.map((item) => {
                 const norm = item.score / maxScore;
-                return Math.round((28 + norm * 46) * sizeScale);
+                return Math.round((22 + norm * 34) * sizeScale);
             });
             const avgSize = sizes.reduce((sum, n) => sum + n, 0) / Math.max(count, 1);
             const layoutMaxRing = bubbleMaxRingPct(avgSize, stageW, stageH);
@@ -1935,19 +1990,20 @@
                 const sizePx = sizes[rank];
                 const rankT = count > 1 ? rank / (count - 1) : 0;
                 const scoreBias = 0.3 + (1 - norm) * 0.7;
-                const spreadPower = count <= 14 ? 0.55 : 0.78;
-                const countScale = count <= 14 ? 0.72 + (count / 14) * 0.28 : 1;
+                const spreadPower = count <= 14 ? 0.5 : 0.82;
+                const countScale = count <= 14 ? 0.65 + (count / 14) * 0.35 : 0.92;
                 const baseRing = layoutMaxRing * Math.pow(rankT, spreadPower) * scoreBias * countScale;
-                const angle = bubbleSeedAngle(item.id) + rank * golden;
+                const seed = bubbleSeedAngle(item.id);
 
                 let chosen = null;
-                for (let extra = 0; extra < 100; extra++) {
-                    const ring = Math.min(baseRing + extra * 0.55, layoutMaxRing);
+                for (let extra = 0; extra < 160; extra++) {
+                    const ring = Math.min(baseRing + Math.floor(extra / 10) * 0.65, layoutMaxRing);
+                    const angle = seed + rank * golden + (extra % 10) * 0.52;
                     const cx = 50 + Math.cos(angle) * ring;
                     const cy = 50 + Math.sin(angle) * ring * 0.88;
                     const clamped = clampBubbleCenter(cx, cy, sizePx, stageW, stageH);
                     const candidate = { left: clamped.left, top: clamped.top, sizePx };
-                    if (!placed.some((p) => bubblesOverlapPx(candidate, p, BUBBLE_LAYOUT_GAP_PX, stageW, stageH))) {
+                    if (!placed.some((p) => bubblesOverlapPx(candidate, p, layoutGap, stageW, stageH))) {
                         chosen = candidate;
                         break;
                     }
@@ -1984,7 +2040,9 @@
                 });
             });
 
-            return relaxBubbleLayout(placed, stageW, stageH)
+            shrinkBubblesUntilClear(placed, stageW, stageH);
+
+            return placed
                 .map((b) => {
                     const clamped = clampBubbleCenter(b.left, b.top, b.sizePx, stageW, stageH);
                     return {

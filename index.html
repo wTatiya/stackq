@@ -181,6 +181,17 @@
             }
             .bubble-interactive { display: none; }
         }
+        .whimsy-particles {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .whimsy-particles { display: none; }
+        }
         .app-root {
             position: relative;
             min-height: 100dvh;
@@ -2578,6 +2589,274 @@
             );
         };
 
+        const WHIMSY_CANDY_COLORS = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#FF9AA2'];
+        const WHIMSY_PARTICLE_COUNT = 5;
+        const WHIMSY_GRAVITY = 0.7;
+        const WHIMSY_EXPLOSION_FORCE = 8;
+
+        const WhimsyClickEffect = () => {
+            const canvasRef = React.useRef(null);
+            const particlesRef = React.useRef([]);
+            const animationFrameId = React.useRef(null);
+            const audioCtxRef = React.useRef(null);
+            const reducedMotionRef = React.useRef(
+                typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            );
+
+            const playPopSound = () => {
+                if (reducedMotionRef.current) return;
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContext) return;
+                    if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+                    const ctx = audioCtxRef.current;
+                    if (ctx.state === 'suspended') ctx.resume();
+
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(180, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(750, ctx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.12);
+
+                    setTimeout(() => {
+                        const osc2 = ctx.createOscillator();
+                        const gain2 = ctx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(ctx.destination);
+                        osc2.type = 'triangle';
+                        osc2.frequency.setValueAtTime(800, ctx.currentTime);
+                        osc2.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.08);
+                        gain2.gain.setValueAtTime(0.1, ctx.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                        osc2.start();
+                        osc2.stop(ctx.currentTime + 0.08);
+                    }, 40);
+                } catch (e) {
+                    console.warn('Whimsy audio failed:', e);
+                }
+            };
+
+            const resizeCanvas = () => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+
+            const triggerExplosion = (clientX, clientY) => {
+                if (reducedMotionRef.current) return;
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+
+                const x = clientX;
+                const y = clientY;
+                const availableTypes = ['star', 'ribbon'];
+                const newParticles = [];
+
+                playPopSound();
+
+                for (let i = 0; i < WHIMSY_PARTICLE_COUNT; i++) {
+                    const type = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+                    const color = WHIMSY_CANDY_COLORS[Math.floor(Math.random() * WHIMSY_CANDY_COLORS.length)];
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = (0.3 + Math.random() * 0.7) * WHIMSY_EXPLOSION_FORCE;
+
+                    newParticles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - (Math.random() * 2),
+                        ax: (Math.random() - 0.5) * 0.05,
+                        ay: 0.1,
+                        spin: (Math.random() - 0.5) * 0.12,
+                        size: 8 + Math.random() * 12,
+                        alpha: 1,
+                        decay: 0.012 + Math.random() * 0.015,
+                        color,
+                        type,
+                        angle: Math.random() * Math.PI * 2,
+                        seed: Math.random() * 10000,
+                        wiggleTime: Math.random() * 10,
+                        wiggleSpeed: 0.08 + Math.random() * 0.12
+                    });
+                }
+
+                particlesRef.current = particlesRef.current.concat(newParticles);
+            };
+
+            React.useEffect(() => {
+                const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+                const onMotionChange = (e) => { reducedMotionRef.current = e.matches; };
+                mq.addEventListener('change', onMotionChange);
+
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas, { passive: true });
+
+                const onPointerDown = (e) => {
+                    triggerExplosion(e.clientX, e.clientY);
+                };
+                window.addEventListener('pointerdown', onPointerDown, { passive: true });
+
+                return () => {
+                    mq.removeEventListener('change', onMotionChange);
+                    window.removeEventListener('resize', resizeCanvas);
+                    window.removeEventListener('pointerdown', onPointerDown);
+                };
+            }, []);
+
+            React.useEffect(() => {
+                if (reducedMotionRef.current) return;
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                const updateAndDraw = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const particles = particlesRef.current;
+
+                    for (let i = particles.length - 1; i >= 0; i--) {
+                        const p = particles[i];
+                        p.vx += p.ax;
+                        p.vy += p.ay + WHIMSY_GRAVITY * 0.15;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.angle += p.spin;
+                        p.alpha -= p.decay;
+                        p.wiggleTime += p.wiggleSpeed;
+
+                        if (p.alpha <= 0 || p.y > canvas.height + 50) {
+                            particles.splice(i, 1);
+                            continue;
+                        }
+
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+
+                        let prngIndex = 0;
+                        const prng = () => {
+                            prngIndex++;
+                            return Math.sin(p.seed + prngIndex * 13.5432) * 0.5;
+                        };
+                        const applyOffset = (val, max) => val + prng() * max;
+
+                        const sketchyStrokeAndFill = (isLineOnly = false) => {
+                            ctx.lineCap = 'round';
+                            ctx.lineJoin = 'round';
+
+                            if (!isLineOnly) {
+                                ctx.save();
+                                ctx.translate(applyOffset(0, p.size * 0.15), applyOffset(0, p.size * 0.15));
+                                ctx.fillStyle = p.color;
+                                ctx.fill();
+                                ctx.translate(applyOffset(0, p.size * 0.2), applyOffset(0, p.size * 0.2));
+                                ctx.globalAlpha = p.alpha * 0.6;
+                                ctx.fill();
+                                ctx.restore();
+                            }
+
+                            const drawBorderPass = (color, widthBase, alphaMod, offsetSpread) => {
+                                ctx.save();
+                                ctx.translate(applyOffset(0, offsetSpread), applyOffset(0, offsetSpread));
+                                ctx.strokeStyle = color;
+                                ctx.lineWidth = widthBase + Math.abs(prng()) * 2 * (widthBase * 0.5);
+                                ctx.globalAlpha = p.alpha * alphaMod;
+                                ctx.stroke();
+                                ctx.restore();
+                            };
+
+                            if (isLineOnly) {
+                                drawBorderPass(p.color, 9, 1, 3);
+                                drawBorderPass(p.color, 4, 0.7, 5);
+                                drawBorderPass('#1E293B', 3.5, 0.9, 2);
+                                drawBorderPass('#1E293B', 1.5, 0.6, 4);
+                            } else {
+                                drawBorderPass('#1E293B', 6, 0.3, 4);
+                                drawBorderPass('#1E293B', 3.5, 0.9, 1);
+                                drawBorderPass('#1E293B', 1.5, 0.7, 3);
+                            }
+                        };
+
+                        if (p.type === 'star') {
+                            ctx.translate(p.x, p.y);
+                            ctx.rotate(p.angle);
+                            ctx.beginPath();
+                            const points = 5;
+                            const outerRadius = p.size;
+                            const innerRadius = p.size * 0.45;
+                            let lastX;
+                            let lastY;
+
+                            for (let j = 0; j <= 2 * points; j++) {
+                                const starAngle = (j * Math.PI) / points - Math.PI / 2;
+                                const r = (j % 2 === 0) ? outerRadius : innerRadius;
+                                const offsetR = r + applyOffset(0, p.size * 0.35);
+                                const sx = Math.cos(starAngle) * offsetR;
+                                const sy = Math.sin(starAngle) * offsetR;
+
+                                if (j === 0) {
+                                    ctx.moveTo(sx, sy);
+                                } else {
+                                    const midX = (lastX + sx) / 2 + applyOffset(0, p.size * 0.3);
+                                    const midY = (lastY + sy) / 2 + applyOffset(0, p.size * 0.3);
+                                    ctx.quadraticCurveTo(midX, midY, sx, sy);
+                                }
+                                lastX = sx;
+                                lastY = sy;
+                            }
+                            ctx.closePath();
+                            sketchyStrokeAndFill(false);
+                        } else if (p.type === 'ribbon') {
+                            ctx.translate(p.x, p.y);
+                            ctx.rotate(p.angle);
+                            ctx.beginPath();
+
+                            const length = p.size * 3;
+                            ctx.moveTo(-length / 2, applyOffset(0, 4));
+
+                            const midX = applyOffset(0, 3);
+                            const midY = applyOffset(0, 4);
+                            const ctrlX1 = -length / 4 + applyOffset(0, 6);
+                            const ctrlY1 = Math.sin(p.wiggleTime) * p.size * 2 + applyOffset(0, 5);
+                            const endX = length / 2;
+                            const endY = Math.cos(p.wiggleTime) * p.size + applyOffset(0, 4);
+                            const ctrlX2 = length / 4 + applyOffset(0, 6);
+                            const ctrlY2 = -Math.sin(p.wiggleTime) * p.size * 2 + applyOffset(0, 5);
+
+                            ctx.quadraticCurveTo(ctrlX1, ctrlY1, midX, midY);
+                            ctx.quadraticCurveTo(ctrlX2, ctrlY2, endX, endY);
+                            sketchyStrokeAndFill(true);
+                        }
+
+                        ctx.restore();
+                    }
+
+                    animationFrameId.current = requestAnimationFrame(updateAndDraw);
+                };
+
+                updateAndDraw();
+
+                return () => {
+                    if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+                };
+            }, []);
+
+            if (reducedMotionRef.current) return null;
+
+            return (
+                <canvas
+                    ref={canvasRef}
+                    className="whimsy-particles"
+                    aria-hidden="true"
+                />
+            );
+        };
+
         const DoodleDecorations = () => (
             <>
                 <div className="doodle-deco doodle-deco-1" aria-hidden="true">
@@ -3352,6 +3631,7 @@
                     style={{ '--org-footer-height': isAdminView ? '0px' : '3.5rem' }}
                 >
                     <BubbleBackground interactive={view === 'survey'} />
+                    <WhimsyClickEffect />
                     <div className="relative">
                         {view === 'survey' && <App />}
                         {view === 'admin-login' && (

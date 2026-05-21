@@ -41,6 +41,8 @@
             --shadow-hard: 4px 4px 0 var(--ink);
             --shadow-pressed: 1px 1px 0 var(--ink);
             --border-ink: 2.5px solid var(--ink);
+            --bubble-pink: #ffd8e8;
+            --bubble-paper: #fff6fa;
         }
 
         html, body { font-family: 'Itim', sans-serif; color: var(--ink); }
@@ -518,17 +520,13 @@
             inset: 11% 9.5% 10% 9.5%;
             contain: layout paint;
             overflow: hidden;
-            background-color: #fff6fa;
-            background-image:
-                radial-gradient(ellipse 55% 45% at 18% 22%, rgba(255, 196, 210, 0.45), transparent 55%),
-                radial-gradient(ellipse 50% 40% at 82% 78%, rgba(255, 210, 225, 0.35), transparent 55%),
-                radial-gradient(ellipse 45% 38% at 72% 18%, rgba(255, 230, 240, 0.4), transparent 50%),
-                repeating-linear-gradient(
-                    transparent,
-                    transparent 27px,
-                    rgba(50, 50, 50, 0.05) 27px,
-                    rgba(50, 50, 50, 0.05) 28px
-                );
+            background-color: var(--bubble-paper);
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 27px,
+                rgba(50, 50, 50, 0.05) 27px,
+                rgba(50, 50, 50, 0.05) 28px
+            );
         }
         .admin-stage-badge {
             position: absolute;
@@ -547,16 +545,6 @@
             transform: translate(-50%, -50%);
             border-radius: 50%;
             border: 2px dashed rgba(50, 50, 50, 0.15);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .admin-bubble-stage::after {
-            content: '';
-            position: absolute;
-            inset: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.82);
-            border-radius: 22px 10px 24px 12px / 12px 22px 10px 20px;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
             pointer-events: none;
             z-index: 0;
         }
@@ -1814,27 +1802,12 @@
                     preserveAspectRatio="none"
                     aria-hidden="true"
                 >
-                    <defs>
-                        <linearGradient id="stackqBubbleFrameGrad" x1="8%" y1="6%" x2="92%" y2="94%">
-                            <stop offset="0%" stopColor="#fff5f9" />
-                            <stop offset="42%" stopColor="#ffd8e8" />
-                            <stop offset="100%" stopColor="#ffb3c8" />
-                        </linearGradient>
-                    </defs>
                     <path
                         d={BUBBLE_FRAME_SCALLOP_PATH}
-                        fill="url(#stackqBubbleFrameGrad)"
+                        fill="var(--bubble-pink)"
                         stroke="var(--ink)"
                         strokeWidth="3.5"
                         vectorEffect="non-scaling-stroke"
-                    />
-                    <path
-                        d={BUBBLE_FRAME_SCALLOP_PATH}
-                        fill="none"
-                        stroke="rgba(255,255,255,0.9)"
-                        strokeWidth="2"
-                        vectorEffect="non-scaling-stroke"
-                        transform="translate(100 100) scale(0.9) translate(-100 -100)"
                     />
                 </svg>
                 <div className="admin-bubble-stage" ref={stageRef} aria-label={ariaLabel}>

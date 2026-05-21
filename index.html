@@ -502,6 +502,7 @@
             max-height: 100%;
             aspect-ratio: 16 / 9;
             overflow: hidden;
+            background: var(--bubble-pink);
             filter: drop-shadow(4px 4px 0 var(--ink));
             transform: rotate(0.35deg);
         }
@@ -593,15 +594,17 @@
         }
         .admin-cloud-more {
             position: absolute;
-            bottom: 0.55rem;
+            bottom: 0.65rem;
             left: 0.75rem;
             font-size: 0.68rem;
             font-weight: 600;
-            opacity: 0.75;
-            padding: 0.2rem 0.5rem;
-            background: var(--paper);
-            border: 2px dashed rgba(50, 50, 50, 0.25);
-            border-radius: var(--sketch-radius-pill);
+            color: var(--ink-dark);
+            opacity: 0.85;
+            padding: 0.15rem 0.45rem;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
         .admin-logo-bubble .relative {
             width: 62% !important;
@@ -1932,7 +1935,9 @@
                 const sizePx = sizes[rank];
                 const rankT = count > 1 ? rank / (count - 1) : 0;
                 const scoreBias = 0.3 + (1 - norm) * 0.7;
-                const baseRing = layoutMaxRing * Math.pow(rankT, 0.78) * scoreBias;
+                const spreadPower = count <= 14 ? 0.55 : 0.78;
+                const countScale = count <= 14 ? 0.72 + (count / 14) * 0.28 : 1;
+                const baseRing = layoutMaxRing * Math.pow(rankT, spreadPower) * scoreBias * countScale;
                 const angle = bubbleSeedAngle(item.id) + rank * golden;
 
                 let chosen = null;

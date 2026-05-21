@@ -296,6 +296,15 @@
             box-shadow: var(--shadow-hard);
             transform: rotate(-0.35deg);
         }
+        .admin-header--minimal {
+            min-height: auto;
+            padding: 0.35rem 0.5rem;
+            margin-bottom: 0.5rem;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transform: none;
+        }
         .admin-header-brand {
             display: flex;
             align-items: center;
@@ -439,6 +448,44 @@
             border-radius: var(--sketch-radius-sm);
             transform: rotate(0.6deg);
         }
+        .admin-qr-block {
+            margin-top: 0.5rem;
+            padding: 0.55rem;
+            text-align: center;
+            background: var(--paper);
+            border: var(--border-ink);
+            border-radius: var(--sketch-radius-sm);
+            box-shadow: 3px 3px 0 var(--ink);
+            transform: rotate(-1.2deg);
+        }
+        .admin-qr-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--ink-dark);
+            margin-bottom: 0.4rem;
+            line-height: 1.35;
+        }
+        .admin-qr-img {
+            display: block;
+            width: 100%;
+            max-width: 9.5rem;
+            height: auto;
+            margin: 0 auto;
+            border-radius: 6px;
+        }
+        .admin-qr-link {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.62rem;
+            color: var(--ink);
+            opacity: 0.7;
+            word-break: break-all;
+            text-decoration: none;
+        }
+        .admin-qr-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
         .admin-bubble-stage {
             position: relative;
             flex: 1;
@@ -496,17 +543,45 @@
             border: 2.5px solid var(--ink);
             box-shadow: 4px 4px 0 var(--ink);
             animation: admin-bubble-float 7s ease-in-out infinite;
-            transition: width 0.6s ease, height 0.6s ease, left 0.8s ease, top 0.8s ease, transform 0.6s ease;
-            z-index: 1;
+            transition: width 0.5s ease, height 0.5s ease, left 0.6s ease, top 0.6s ease,
+                opacity 0.5s ease, filter 0.5s ease, box-shadow 0.2s ease;
+            will-change: left, top, transform;
         }
         .admin-logo-bubble--coral { background: rgba(255, 235, 235, 0.95); }
         .admin-logo-bubble--lavender { background: rgba(248, 246, 255, 0.95); }
         .admin-logo-bubble--mint { background: rgba(232, 250, 248, 0.95); }
         .admin-logo-bubble--yellow { background: rgba(255, 252, 232, 0.95); }
-        .admin-logo-bubble:hover {
-            z-index: 10;
+        .admin-logo-bubble--faded {
+            animation-name: admin-bubble-float-subtle;
+            pointer-events: none;
+            border-color: rgba(50, 50, 50, 0.28);
+            box-shadow: 2px 2px 0 rgba(50, 50, 50, 0.2);
+        }
+        .admin-logo-bubble--faded .admin-logo-bubble-score {
+            background: rgba(255, 107, 107, 0.55);
+            border-color: rgba(50, 50, 50, 0.35);
+        }
+        .admin-logo-bubble:hover,
+        .admin-logo-bubble--focusable:hover {
+            z-index: 300 !important;
             animation-play-state: paused;
+            opacity: 1 !important;
+            filter: saturate(1) !important;
             box-shadow: 5px 5px 0 var(--ink);
+            pointer-events: auto;
+        }
+        .admin-cloud-more {
+            position: absolute;
+            bottom: 0.55rem;
+            left: 0.75rem;
+            z-index: 5;
+            font-size: 0.68rem;
+            font-weight: 600;
+            opacity: 0.75;
+            padding: 0.2rem 0.5rem;
+            background: var(--paper);
+            border: 2px dashed rgba(50, 50, 50, 0.25);
+            border-radius: var(--sketch-radius-pill);
         }
         .admin-logo-bubble .relative {
             width: 62% !important;
@@ -560,6 +635,10 @@
             0%, 100% { transform: translate(-50%, -50%) rotate(var(--bubble-tilt, 0deg)); }
             33% { transform: translate(-50%, calc(-50% - 6px)) rotate(calc(var(--bubble-tilt, 0deg) + 2deg)); }
             66% { transform: translate(-50%, calc(-50% + 5px)) rotate(calc(var(--bubble-tilt, 0deg) - 2deg)); }
+        }
+        @keyframes admin-bubble-float-subtle {
+            0%, 100% { transform: translate(-50%, -50%) rotate(var(--bubble-tilt, 0deg)); }
+            50% { transform: translate(-50%, calc(-50% - 3px)) rotate(var(--bubble-tilt, 0deg)); }
         }
         @media (prefers-reduced-motion: reduce) {
             .admin-logo-bubble { animation: none; }
@@ -1402,6 +1481,8 @@
         const ADMIN_PASSWORD = 'somdej2445';
         const ADMIN_SESSION_KEY = 'stackq_admin_auth';
         const ADMIN_POLL_MS = 5000;
+        const SURVEY_PUBLIC_URL = 'https://wtatiya.github.io/stackq/';
+        const SURVEY_QR_IMAGE = 'assets/qrcode-survey.png';
         const ORG_LABEL = 'ฝ่ายการพยาบาล โรงพยาบาลสมเด็จพระบรมราชเทวี ณ ศรีราชา';
 
         const PROFICIENCY_SCORES = { none: 0, basic: 2, pro: 3 };
@@ -1498,40 +1579,127 @@
             'admin-logo-bubble--mint',
             'admin-logo-bubble--yellow'
         ];
+        const ADMIN_CLOUD_MAX_BUBBLES = 48;
+
+        const bubbleSeedAngle = (id) => {
+            let h = 0;
+            for (let i = 0; i < id.length; i++) h += id.charCodeAt(i);
+            return (h % 360) * (Math.PI / 180);
+        };
+
+        const bubblesOverlap = (a, b, gapPct) => {
+            const dx = a.left - b.left;
+            const dy = a.top - b.top;
+            return Math.hypot(dx, dy) < a.rPct + b.rPct + gapPct;
+        };
+
+        const computeBubbleLayout = (items, stageW, stageH) => {
+            const maxScore = Math.max(...items.map((i) => i.score), 1);
+            const minDim = Math.min(stageW, stageH) || 500;
+            const count = items.length;
+            const sizeScale = Math.min(1, 38 / Math.sqrt(Math.max(count, 1)));
+            const golden = Math.PI * (3 - Math.sqrt(5));
+            const placed = [];
+
+            const sorted = [...items].sort((a, b) => a.score - b.score);
+
+            sorted.forEach((item, rank) => {
+                const norm = item.score / maxScore;
+                const sizePx = Math.round((34 + norm * 58) * sizeScale);
+                const rPct = (sizePx / minDim) * 50;
+                const baseRing = 12 + (1 - norm) * 30;
+                const seed = bubbleSeedAngle(item.id);
+                const gap = 2.2 + (1 - norm) * 0.8;
+
+                let chosen = null;
+
+                for (let attempt = 0; attempt < 140; attempt++) {
+                    const ring = baseRing + attempt * 0.38;
+                    const angle = seed + rank * golden + attempt * 0.31;
+                    const cx = 50 + Math.cos(angle) * ring;
+                    const cy = 50 + Math.sin(angle) * ring * 0.88;
+                    const left = Math.max(6 + rPct, Math.min(94 - rPct, cx));
+                    const top = Math.max(8 + rPct, Math.min(92 - rPct, cy));
+                    const candidate = { left, top, sizePx, rPct };
+
+                    if (!placed.some((p) => bubblesOverlap(candidate, p, gap))) {
+                        chosen = candidate;
+                        break;
+                    }
+                }
+
+                if (!chosen) {
+                    const fallbackRing = 38 + (rank % 10) * 1.5;
+                    const angle = seed + rank * 0.7;
+                    chosen = {
+                        left: Math.max(10, Math.min(90, 50 + Math.cos(angle) * fallbackRing)),
+                        top: Math.max(12, Math.min(88, 50 + Math.sin(angle) * fallbackRing * 0.88)),
+                        sizePx,
+                        rPct
+                    };
+                }
+
+                const opacity = 0.26 + norm * 0.74;
+                const zIndex = Math.round(10 + norm * 120);
+                const saturation = 0.3 + norm * 0.7;
+                const delay = (rank % 7) * 0.45;
+                const duration = 5.5 + (rank % 5) * 0.9;
+                const tilt = ((rank % 5) - 2) * 4;
+                const tint = ADMIN_BUBBLE_TINTS[rank % ADMIN_BUBBLE_TINTS.length];
+                const faded = norm < 0.42;
+                const focusable = norm >= 0.42;
+
+                placed.push({
+                    ...item,
+                    ...chosen,
+                    norm,
+                    opacity,
+                    zIndex,
+                    saturation,
+                    delay,
+                    duration,
+                    tilt,
+                    tint,
+                    faded,
+                    focusable
+                });
+            });
+
+            return placed.sort((a, b) => a.zIndex - b.zIndex);
+        };
 
         const LogoBubbleCloud = ({ items }) => {
             const stageRef = React.useRef(null);
             const [layout, setLayout] = React.useState([]);
+            const [hiddenCount, setHiddenCount] = React.useState(0);
 
             React.useEffect(() => {
+                const el = stageRef.current;
                 if (!items.length) {
                     setLayout([]);
+                    setHiddenCount(0);
                     return;
                 }
-                const maxScore = Math.max(...items.map((i) => i.score), 1);
-                const n = items.length;
-                const golden = Math.PI * (3 - Math.sqrt(5));
 
-                const next = items.map((item, i) => {
-                    const norm = item.score / maxScore;
-                    const angle = i * golden + (item.id.charCodeAt(0) % 7) * 0.08;
-                    const radiusPct = 6 + (1 - norm) * 40;
-                    const left = 50 + Math.cos(angle) * radiusPct;
-                    const top = 50 + Math.sin(angle) * radiusPct;
-                    const sizePx = Math.round(56 + norm * 100);
-                    const delay = (i % 7) * 0.45;
-                    const duration = 5.5 + (i % 5) * 0.9;
-                    const tilt = ((i % 5) - 2) * 5;
-                    const tint = ADMIN_BUBBLE_TINTS[i % ADMIN_BUBBLE_TINTS.length];
-                    return { ...item, left, top, sizePx, delay, duration, tilt, tint };
-                });
-                setLayout(next);
+                const runLayout = () => {
+                    const rect = el ? el.getBoundingClientRect() : { width: 900, height: 506 };
+                    const display = items.length > ADMIN_CLOUD_MAX_BUBBLES
+                        ? items.slice(0, ADMIN_CLOUD_MAX_BUBBLES)
+                        : items;
+                    setHiddenCount(Math.max(0, items.length - display.length));
+                    setLayout(computeBubbleLayout(display, rect.width, rect.height));
+                };
+
+                runLayout();
+                if (!el || typeof ResizeObserver === 'undefined') return undefined;
+                const ro = new ResizeObserver(runLayout);
+                ro.observe(el);
+                return () => ro.disconnect();
             }, [items]);
 
             if (!items.length) {
                 return (
                     <div className="admin-bubble-stage">
-                        <span className="doodle-badge admin-stage-badge">คลาวด์โลโก้</span>
                         <div className="admin-empty">
                             <div className="admin-empty-icon" aria-hidden="true">
                                 <svg className="w-7 h-7" style={{ color: 'var(--ink)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1546,16 +1714,23 @@
 
             return (
                 <div className="admin-bubble-stage" ref={stageRef} aria-label="กราฟโลโก้ตามคะแนน">
-                    <span className="doodle-badge admin-stage-badge">คลาวด์โลโก้</span>
+                    {hiddenCount > 0 && (
+                        <span className="admin-cloud-more">
+                            แสดง {layout.length} อันดับสูงสุด (อีก {hiddenCount} รายการ)
+                        </span>
+                    )}
                     {layout.map((bubble) => (
                         <div
                             key={bubble.name}
-                            className={`admin-logo-bubble ${bubble.tint}`}
+                            className={`admin-logo-bubble ${bubble.tint}${bubble.faded ? ' admin-logo-bubble--faded' : ''}${bubble.focusable ? ' admin-logo-bubble--focusable' : ''}`}
                             style={{
                                 left: `${bubble.left}%`,
                                 top: `${bubble.top}%`,
                                 width: bubble.sizePx,
                                 height: bubble.sizePx,
+                                zIndex: bubble.zIndex,
+                                opacity: bubble.opacity,
+                                filter: `saturate(${bubble.saturation})`,
                                 animationDelay: `${bubble.delay}s`,
                                 animationDuration: `${bubble.duration}s`,
                                 '--bubble-tilt': `${bubble.tilt}deg`
@@ -1564,7 +1739,12 @@
                         >
                             <span className="admin-bubble-tooltip">{bubble.name}</span>
                             <AppLogo id={bubble.id} slug={bubble.slug} name={bubble.name} />
-                            <span className="admin-logo-bubble-score">{bubble.score}</span>
+                            <span
+                                className="admin-logo-bubble-score"
+                                style={{ opacity: 0.45 + bubble.norm * 0.55 }}
+                            >
+                                {bubble.score}
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -1639,13 +1819,11 @@
             const [selectedId, setSelectedId] = React.useState('');
             const [loading, setLoading] = React.useState(true);
             const [fetchError, setFetchError] = React.useState('');
-            const [updatedAt, setUpdatedAt] = React.useState(null);
 
             const load = React.useCallback(async () => {
                 try {
                     const data = await fetchAdminSessions(ADMIN_PASSWORD);
                     setSessions(data.sessions || []);
-                    setUpdatedAt(data.updatedAt || new Date().toISOString());
                     setFetchError('');
                     setSelectedId((prev) => {
                         if (prev && data.sessions.some((s) => s.id === prev)) return prev;
@@ -1673,30 +1851,8 @@
             return (
                 <div className="admin-page admin-page--dashboard relative z-[1]">
                     <DoodleDecorations />
-                    <header className="admin-header">
-                        <div className="admin-header-brand">
-                            <div className="doodle-icon-box admin-header-icon flex items-center justify-center" aria-hidden="true">
-                                <svg className="w-7 h-7" style={{ color: 'var(--ink)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h1 className="doodle-title doodle-title-playful admin-header-title uppercase">
-                                    ผลแบบสำรวจสด
-                                </h1>
-                                <p className="doodle-subtitle admin-header-meta">
-                                    <span className="admin-live-badge">
-                                        <span className="admin-live-dot" aria-hidden="true" />
-                                        LIVE
-                                    </span>
-                                    <span>อัปเดตทุก {ADMIN_POLL_MS / 1000} วินาที</span>
-                                    {updatedAt && (
-                                        <span className="opacity-75">ล่าสุด {new Date(updatedAt).toLocaleTimeString('th-TH')}</span>
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-                        <button type="button" className="doodle-btn doodle-btn-ghost shrink-0" onClick={onLogout}>
+                    <header className="admin-header admin-header--minimal">
+                        <button type="button" className="doodle-btn doodle-btn-ghost shrink-0 ml-auto" onClick={onLogout}>
                             ออกจากระบบ
                         </button>
                     </header>
@@ -1711,7 +1867,6 @@
                         <div className="admin-dashboard-shell">
                             <aside className="admin-sidebar doodle-card">
                                 <div className="admin-sidebar-section">
-                                    <p className="admin-sidebar-heading">รอบตามวันที่ส่ง</p>
                                     <div className="admin-sidebar-scroll">
                                         <div className="admin-session-tabs" role="tablist" aria-label="รอบตามวันที่ส่ง">
                                             {sessions.length === 0 ? (
@@ -1738,13 +1893,35 @@
                                         <span className="admin-stat-pill admin-stat-pill--mint">
                                             ผู้ส่ง: <strong>{activeSession.participantCount}</strong> คน
                                         </span>
-                                        <span className="admin-stat-pill admin-stat-pill--lavender">
-                                            โปรแกรมที่มีคะแนน: <strong>{bubbleItems.length}</strong>
-                                        </span>
                                         <p className="admin-legend doodle-subtitle">
                                             คะแนนสูง → โลโก้ใหญ่และอยู่ใกล้กลางจอ<br />
                                             ใช้งาน +2 · ประจำ +3 · ภาษาโปรแกรม +0–5
                                         </p>
+                                        <div className="admin-qr-block">
+                                            <p className="admin-qr-caption">สแกนเพื่อทำแบบสำรวจ</p>
+                                            <a
+                                                href={SURVEY_PUBLIC_URL}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                aria-label="เปิดแบบสำรวจ"
+                                            >
+                                                <img
+                                                    className="admin-qr-img"
+                                                    src={SURVEY_QR_IMAGE}
+                                                    alt="QR Code แบบสำรวจ"
+                                                    width={152}
+                                                    height={152}
+                                                />
+                                            </a>
+                                            <a
+                                                className="admin-qr-link"
+                                                href={SURVEY_PUBLIC_URL}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {SURVEY_PUBLIC_URL.replace(/^https:\/\//, '')}
+                                            </a>
+                                        </div>
                                     </div>
                                 )}
                             </aside>

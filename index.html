@@ -479,6 +479,33 @@
             background: var(--coral);
             color: #fff;
         }
+        .doodle-know-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        @media (min-width: 480px) {
+            .doodle-know-options { grid-template-columns: 1fr 1fr; }
+        }
+        .doodle-know-options .doodle-btn {
+            flex: none;
+            width: 100%;
+            min-height: 40px;
+            padding: 0.5rem 0.65rem;
+            font-size: 0.7rem;
+            line-height: 1.25;
+            text-align: left;
+        }
+        @media (min-width: 640px) {
+            .doodle-know-options .doodle-btn { font-size: 0.8rem; }
+        }
+        .doodle-btn-know-0 { background: #e8e8e8; color: var(--ink); }
+        .doodle-btn-know-1 { background: var(--lavender); color: var(--ink-dark); }
+        .doodle-btn-know-2 { background: #d4e8ff; color: var(--ink-dark); }
+        .doodle-btn-know-3 { background: var(--mint-light); color: var(--ink-dark); }
+        .doodle-btn-know-4 { background: var(--mint); color: var(--ink-dark); }
+        .doodle-btn-know-5 { background: var(--coral-light); color: var(--ink-dark); }
+        .doodle-btn-know-6 { background: var(--coral); color: #fff; }
         .doodle-btn-primary {
             min-height: 48px;
             padding: 1rem 1.25rem;
@@ -793,9 +820,7 @@
                     { id: 'deepseek', name: 'Deepseek AI', slug: 'deepseek' },
                     { id: 'grok', name: 'Grok AI', slug: 'x' },
                     { id: 'kimi', name: 'Kimi AI', slug: 'moonshotai' },
-                    { id: 'okara', name: 'Okara AI', slug: 'okara' },
-                    { id: 'lovable', name: 'Lovable AI', slug: 'lovable' },
-                    { id: 'bolt', name: 'Bolt', slug: 'bolt' }
+                    { id: 'okara', name: 'Okara AI', slug: 'okara' }
                 ]
             },
             {
@@ -813,8 +838,17 @@
                 ]
             },
             {
+                id: 'form_maker',
+                title: 'เครื่องมือสร้างฟอร์ม (Form Makers)',
+                apps: [
+                    { id: 'jotform', name: 'Jotform', slug: 'jotform' },
+                    { id: 'tally', name: 'Tally Form', slug: 'tally' },
+                    { id: 'surveymonkey', name: 'SurveyMonkey', slug: 'surveymonkey' }
+                ]
+            },
+            {
                 id: 'builders',
-                title: 'สร้างเว็บไซต์และแอป (Web & App Builders)',
+                title: 'พัฒนาเว็บและอีคอมเมิร์ซ (Web Dev & E-commerce)',
                 apps: [
                     { id: 'gsite', name: 'Google Site', slug: 'googlesites' },
                     { id: 'wordpress', name: 'WordPress', slug: 'wordpress' },
@@ -822,10 +856,48 @@
                     { id: 'webflow', name: 'Webflow', slug: 'webflow' },
                     { id: 'squarespace', name: 'SquareSpace', slug: 'squarespace' },
                     { id: 'weebly', name: 'Weebly', slug: 'weebly' },
-                    { id: 'bubble', name: 'Bubble', slug: 'bubble' },
-                    { id: 'glide', name: 'Glide', slug: 'glide' },
+                    { id: 'weweb', name: 'WeWeb', slug: 'weweb' },
                     { id: 'carrd', name: 'Carrd', slug: 'carrd' },
-                    { id: 'universe', name: 'Universe', slug: 'universe' }
+                    { id: 'universe', name: 'Universe', slug: 'universe' },
+                    { id: 'webex', name: 'Webex', slug: 'webex' },
+                    { id: 'shopify', name: 'Shopify', slug: 'shopify' },
+                    { id: 'godaddy', name: 'GoDaddy', slug: 'godaddy' }
+                ]
+            },
+            {
+                id: 'nocode',
+                title: 'สร้างแอปแบบ No-Code (No-Code App Builders)',
+                apps: [
+                    { id: 'replit', name: 'Replit', slug: 'replit' },
+                    { id: 'lovable', name: 'Lovable', slug: 'lovable' },
+                    { id: 'bolt', name: 'Bolt.new', slug: 'bolt' },
+                    { id: 'appsheet', name: 'AppSheet (Google)', slug: 'googleappsheet' },
+                    { id: 'rocket', name: 'Rocket.new', slug: 'rocket' },
+                    { id: 'thunkable', name: 'Thunkable', slug: 'thunkable' },
+                    { id: 'flutterflow', name: 'FlutterFlow', slug: 'flutterflow' },
+                    { id: 'softr', name: 'Softr', slug: 'softr' },
+                    { id: 'sharetribe', name: 'Sharetribe', slug: 'sharetribe' },
+                    { id: 'adalo', name: 'Adalo', slug: 'adalo' },
+                    { id: 'base44', name: 'Base44', slug: 'base44' },
+                    { id: 'hostinger_horizon', name: 'Hostinger Horizon', slug: 'hostinger' },
+                    { id: 'bubble', name: 'Bubble', slug: 'bubble' },
+                    { id: 'glide', name: 'Glide', slug: 'glide' }
+                ]
+            },
+            {
+                id: 'ai_artifacts',
+                title: 'แอป/อาร์ติแฟกต์ AI ขนาดเล็ก (AI Mini Apps & Artifacts)',
+                apps: [
+                    { id: 'gemini_gem', name: 'Gemini Gem / Opal', slug: 'googlegemini' },
+                    { id: 'claude_artifact', name: 'Claude Artifact', slug: 'anthropic' }
+                ]
+            },
+            {
+                id: 'business',
+                title: 'แพลตฟอร์มธุรกิจและฐานข้อมูล (Business & Data Platforms)',
+                apps: [
+                    { id: 'airtable', name: 'Airtable', slug: 'airtable' },
+                    { id: 'odoo', name: 'Odoo', slug: 'odoo' }
                 ]
             },
             {
@@ -841,10 +913,26 @@
                     { id: 'github', name: 'GitHub', slug: 'github' },
                     { id: 'gitlab', name: 'GitLab', slug: 'gitlab' },
                     { id: 'bitbucket', name: 'Bitbucket', slug: 'bitbucket' },
-                    { id: 'replit', name: 'Replit', slug: 'replit' },
                     { id: 'codesandbox', name: 'CodeSandbox', slug: 'codesandbox' },
                     { id: 'codepen', name: 'Codepen', slug: 'codepen' },
                     { id: 'collab', name: 'Google Collab', slug: 'googlecolab' }
+                ]
+            },
+            {
+                id: 'programming',
+                questionType: 'know',
+                title: 'ความคุ้นเคยกับภาษาโปรแกรม (Programming Languages)',
+                apps: [
+                    { id: 'py', name: 'Python', slug: 'python' },
+                    { id: 'js', name: 'JavaScript', slug: 'javascript' },
+                    { id: 'java', name: 'Java', slug: 'openjdk' },
+                    { id: 'cpp', name: 'C++', slug: 'cplusplus' },
+                    { id: 'csharp', name: 'C#', slug: 'csharp' },
+                    { id: 'ts', name: 'TypeScript', slug: 'typescript' },
+                    { id: 'sql', name: 'SQL', slug: 'mysql' },
+                    { id: 'htmlcss', name: 'HTML and CSS', slug: 'html5' },
+                    { id: 'rust', name: 'Rust', slug: 'rust' },
+                    { id: 'prog_other', name: 'อื่นๆ (ระบุ)', slug: null }
                 ]
             },
             {
@@ -899,8 +987,25 @@
             grok: ICONIFY('grok'),
             kimi: ICONIFY('moonshot-ai'),
             okara: FAVICON('okara.ai'),
+            jotform: FAVICON('jotform.com'),
+            tally: FAVICON('tally.so'),
+            weweb: FAVICON('weweb.io'),
+            replit: ICONIFY('replit-icon'),
             lovable: FAVICON('lovable.dev'),
             bolt: FAVICON('bolt.new'),
+            appsheet: FAVICON('appsheet.google.com'),
+            rocket: FAVICON('rocket.new'),
+            thunkable: FAVICON('thunkable.com'),
+            flutterflow: FAVICON('flutterflow.io'),
+            softr: FAVICON('softr.io'),
+            sharetribe: FAVICON('sharetribe.com'),
+            adalo: FAVICON('adalo.com'),
+            base44: FAVICON('base44.com'),
+            hostinger_horizon: FAVICON('horizon.hostinger.com'),
+            bubble: ICONIFY('bubble'),
+            glide: FAVICON('glideapps.com'),
+            gemini_gem: FAVICON('gemini.google.com'),
+            claude_artifact: ICONIFY('anthropic-icon'),
             canva: FAVICON('canva.com'),
             powerbi: ICONIFY('microsoft-power-bi'),
             sway: `${FABRIC}/sway_48x1.svg`,
@@ -910,10 +1015,15 @@
             aws: ICONIFY('aws'),
             azure: ICONIFY('microsoft-azure'),
             weebly: ICONIFY('weebly'),
-            bubble: ICONIFY('bubble'),
             codepen: ICONIFY('codepen-icon'),
             gpass: FAVICON('passwords.google.com'),
-            mauth: ICONIFY('microsoft-icon')
+            mauth: ICONIFY('microsoft-icon'),
+            java: ICONIFY('java'),
+            cpp: 'https://cdn.simpleicons.org/cplusplus',
+            csharp: 'https://cdn.simpleicons.org/csharp',
+            sql: 'https://cdn.simpleicons.org/mysql',
+            htmlcss: 'https://cdn.simpleicons.org/html5',
+            prog_other: 'https://api.iconify.design/mdi/code-braces.svg'
         };
 
         /** Pastel bubble colors derived from site palette (coral, lavender, mint, yellow). */
@@ -1187,26 +1297,71 @@
             pro: 'ใช้เป็นประจำ'
         };
 
+        const KNOW_LABELS = {
+            unknown: 'ไม่รู้จัก',
+            heard: 'เคยได้ยิน แต่ไม่รู้ว่าคืออะไร',
+            aware: 'รู้ว่าคืออะไร และใช้ทำอะไร แต่ไม่เคยใช้งาน',
+            basic_use: 'เคยใช้งานพื้นฐาน/ Gen AI',
+            trained: 'เคยผ่านการอบรมเบื้องต้น',
+            fluent: 'สามารถใช้งานได้อย่างคล่องแคล่ว'
+        };
+
+        const KNOW_OPTIONS = [
+            { val: 'unknown', label: KNOW_LABELS.unknown, selectedClass: 'doodle-btn-know-0' },
+            { val: 'heard', label: KNOW_LABELS.heard, selectedClass: 'doodle-btn-know-1' },
+            { val: 'aware', label: KNOW_LABELS.aware, selectedClass: 'doodle-btn-know-2' },
+            { val: 'basic_use', label: KNOW_LABELS.basic_use, selectedClass: 'doodle-btn-know-3' },
+            { val: 'trained', label: KNOW_LABELS.trained, selectedClass: 'doodle-btn-know-4' },
+            { val: 'fluent', label: KNOW_LABELS.fluent, selectedClass: 'doodle-btn-know-6' }
+        ];
+
+        const USAGE_OPTIONS = [
+            { val: 'none', label: PROFICIENCY_LABELS.none, selectedClass: 'doodle-btn-none' },
+            { val: 'basic', label: PROFICIENCY_LABELS.basic, selectedClass: 'doodle-btn-basic' },
+            { val: 'pro', label: PROFICIENCY_LABELS.pro, selectedClass: 'doodle-btn-pro' }
+        ];
+
         const computeResultSummary = (responses) => {
             const counts = { none: 0, basic: 0, pro: 0 };
+            const knowCounts = {};
+            Object.keys(KNOW_LABELS).forEach((k) => { knowCounts[k] = 0; });
             const byCategory = [];
 
             categories.forEach((cat) => {
                 const catResp = responses[cat.id] || {};
+                const isKnow = cat.questionType === 'know';
                 const pro = [];
                 const basic = [];
+                const knowItems = [];
 
                 cat.apps.forEach((app) => {
-                    const val = catResp[app.id] || 'none';
-                    counts[val]++;
-                    if (val === 'pro') pro.push(app.name);
-                    if (val === 'basic') basic.push(app.name);
+                    const defaultVal = isKnow ? 'unknown' : 'none';
+                    const val = catResp[app.id] || defaultVal;
+                    if (isKnow) {
+                        if (knowCounts[val] !== undefined) knowCounts[val]++;
+                        if (val !== 'unknown') knowItems.push(`${app.name}: ${KNOW_LABELS[val] || val}`);
+                    } else {
+                        if (counts[val] !== undefined) counts[val]++;
+                        if (val === 'pro') pro.push(app.name);
+                        if (val === 'basic') basic.push(app.name);
+                    }
                 });
 
                 const otherText = (catResp.otherText || '').trim();
-                if (pro.length || basic.length || otherText) {
+                const otherSpecify = (catResp.otherSpecify || '').trim();
+                if (isKnow) {
+                    if (knowItems.length || otherSpecify) {
+                        byCategory.push({
+                            title: cat.title.split(' (')[0],
+                            isKnow: true,
+                            knowItems,
+                            otherSpecify
+                        });
+                    }
+                } else if (pro.length || basic.length || otherText) {
                     byCategory.push({
                         title: cat.title.split(' (')[0],
+                        isKnow: false,
                         pro,
                         basic,
                         otherText
@@ -1214,7 +1369,7 @@
                 }
             });
 
-            return { counts, byCategory };
+            return { counts, knowCounts, byCategory };
         };
 
         const ResultMiniSummary = ({ responses, skillsToDevelop, pastWork }) => {
@@ -1222,49 +1377,67 @@
             const { counts, byCategory } = summary;
             const hasExtra = skillsToDevelop.trim() || pastWork.trim();
             const hasUsage = byCategory.length > 0;
+            const hasToolUsage = byCategory.some((c) => !c.isKnow);
 
             return (
                 <div className="doodle-card doodle-summary p-4 relative z-[1] text-left w-full">
                     <h3 className="doodle-label text-center mb-3">สรุปผลการตอบแบบสำรวจ</h3>
-                    <div className="doodle-summary-stats">
-                        <div className="doodle-summary-stat doodle-summary-stat--pro">
-                            <strong>{counts.pro}</strong>
-                            {PROFICIENCY_LABELS.pro}
+                    {hasToolUsage && (
+                        <div className="doodle-summary-stats">
+                            <div className="doodle-summary-stat doodle-summary-stat--pro">
+                                <strong>{counts.pro}</strong>
+                                {PROFICIENCY_LABELS.pro}
+                            </div>
+                            <div className="doodle-summary-stat doodle-summary-stat--basic">
+                                <strong>{counts.basic}</strong>
+                                {PROFICIENCY_LABELS.basic}
+                            </div>
+                            <div className="doodle-summary-stat doodle-summary-stat--none">
+                                <strong>{counts.none}</strong>
+                                {PROFICIENCY_LABELS.none}
+                            </div>
                         </div>
-                        <div className="doodle-summary-stat doodle-summary-stat--basic">
-                            <strong>{counts.basic}</strong>
-                            {PROFICIENCY_LABELS.basic}
-                        </div>
-                        <div className="doodle-summary-stat doodle-summary-stat--none">
-                            <strong>{counts.none}</strong>
-                            {PROFICIENCY_LABELS.none}
-                        </div>
-                    </div>
+                    )}
 
                     {hasUsage ? (
                         byCategory.map((cat) => (
                             <div key={cat.title} className="doodle-summary-section">
                                 <div className="doodle-summary-cat">{cat.title}</div>
-                                {cat.pro.length > 0 && (
-                                    <div className="doodle-summary-row">
-                                        <span className="doodle-summary-row-label doodle-summary-row-label--pro">
-                                            {PROFICIENCY_LABELS.pro}
-                                        </span>
-                                        <span className="doodle-summary-apps">{cat.pro.join(', ')}</span>
-                                    </div>
-                                )}
-                                {cat.basic.length > 0 && (
-                                    <div className="doodle-summary-row">
-                                        <span className="doodle-summary-row-label doodle-summary-row-label--basic">
-                                            {PROFICIENCY_LABELS.basic}
-                                        </span>
-                                        <span className="doodle-summary-apps">{cat.basic.join(', ')}</span>
-                                    </div>
-                                )}
-                                {cat.otherText && (
-                                    <div className="doodle-summary-extra">
-                                        <span className="font-bold">อื่นๆ:</span> {cat.otherText}
-                                    </div>
+                                {cat.isKnow ? (
+                                    <>
+                                        {cat.knowItems.map((line) => (
+                                            <div key={line} className="doodle-summary-extra text-sm">{line}</div>
+                                        ))}
+                                        {cat.otherSpecify && (
+                                            <div className="doodle-summary-extra">
+                                                <span className="font-bold">ภาษาอื่นๆ:</span> {cat.otherSpecify}
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        {cat.pro.length > 0 && (
+                                            <div className="doodle-summary-row">
+                                                <span className="doodle-summary-row-label doodle-summary-row-label--pro">
+                                                    {PROFICIENCY_LABELS.pro}
+                                                </span>
+                                                <span className="doodle-summary-apps">{cat.pro.join(', ')}</span>
+                                            </div>
+                                        )}
+                                        {cat.basic.length > 0 && (
+                                            <div className="doodle-summary-row">
+                                                <span className="doodle-summary-row-label doodle-summary-row-label--basic">
+                                                    {PROFICIENCY_LABELS.basic}
+                                                </span>
+                                                <span className="doodle-summary-apps">{cat.basic.join(', ')}</span>
+                                            </div>
+                                        )}
+                                        {cat.otherText && (
+                                            <div className="doodle-summary-extra">
+                                                <span className="font-bold">อื่นๆ:</span> {cat.otherText}
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         ))
@@ -1292,14 +1465,10 @@
             );
         };
 
-        const AppCard = ({ app, value, onChange }) => {
-            const options = [
-                { val: 'none', label: 'ไม่เคยใช้', selectedClass: 'doodle-btn-none' },
-                { val: 'basic', label: 'เคยใช้', selectedClass: 'doodle-btn-basic' },
-                { val: 'pro', label: 'ใช้เป็นประจำ', selectedClass: 'doodle-btn-pro' }
-            ];
-
-            const currentValue = value || 'none';
+        const AppCard = ({ app, value, onChange, questionType = 'usage' }) => {
+            const isKnow = questionType === 'know';
+            const options = isKnow ? KNOW_OPTIONS : USAGE_OPTIONS;
+            const currentValue = value || (isKnow ? 'unknown' : 'none');
 
             return (
                 <div className="doodle-card p-4 mb-3 relative z-[1]">
@@ -1307,7 +1476,7 @@
                         <AppLogo id={app.id} slug={app.slug} name={app.name} />
                         <h3 className="font-bold text-base leading-snug" style={{ color: 'var(--ink-dark)' }}>{app.name}</h3>
                     </div>
-                    <div className="flex gap-2 w-full">
+                    <div className={isKnow ? 'doodle-know-options w-full' : 'flex gap-2 w-full'}>
                         {options.map(opt => {
                             const isSelected = currentValue === opt.val;
                             return (
@@ -1315,7 +1484,7 @@
                                     key={opt.val}
                                     type="button"
                                     onClick={() => onChange(opt.val)}
-                                    className={`doodle-btn flex-1 ${isSelected ? opt.selectedClass : 'doodle-btn-ghost'}`}
+                                    className={`doodle-btn ${isKnow ? '' : 'flex-1'} ${isSelected ? opt.selectedClass : 'doodle-btn-ghost'}`}
                                 >
                                     {opt.label}
                                 </button>
@@ -1371,12 +1540,17 @@
                 };
 
                 categories.forEach(cat => {
+                    const isKnow = cat.questionType === 'know';
+                    const defaultVal = isKnow ? 'unknown' : 'none';
                     cat.apps.forEach(app => {
-                        const val = responses[cat.id]?.[app.id] || 'none';
-                        payload.responses[app.name] = val;
+                        const val = responses[cat.id]?.[app.id] || defaultVal;
+                        payload.responses[app.name] = isKnow ? (KNOW_LABELS[val] || val) : val;
                     });
                     if (responses[cat.id]?.otherText) {
                         payload.responses[`Other: ${cat.title}`] = responses[cat.id].otherText;
+                    }
+                    if (responses[cat.id]?.otherSpecify) {
+                        payload.responses[`Other languages: ${cat.title}`] = responses[cat.id].otherSpecify;
                     }
                 });
 
@@ -1434,6 +1608,16 @@
                     [categoryId]: {
                         ...prev[categoryId],
                         otherText: text
+                    }
+                }));
+            };
+
+            const handleOtherSpecifyChange = (categoryId, text) => {
+                setResponses(prev => ({
+                    ...prev,
+                    [categoryId]: {
+                        ...prev[categoryId],
+                        otherSpecify: text
                     }
                 }));
             };
@@ -1511,28 +1695,48 @@
                         </div>
 
                         <div className="flex-1 pb-36 sm:pb-32">
+                            {category.questionType === 'know' && (
+                                <p className="doodle-subtitle text-sm mb-4 leading-relaxed">
+                                    เลือกระดับความคุ้นเคยกับแต่ละภาษา (ค่าเริ่มต้น: ไม่รู้จัก)
+                                </p>
+                            )}
                             {category.apps.map(app => (
-                                <AppCard 
-                                    key={app.id} 
-                                    app={app} 
-                                    value={catResponses[app.id]} 
-                                    onChange={(val) => handleAppChange(category.id, app.id, val)}
-                                />
+                                <React.Fragment key={app.id}>
+                                    <AppCard
+                                        app={app}
+                                        value={catResponses[app.id]}
+                                        questionType={category.questionType}
+                                        onChange={(val) => handleAppChange(category.id, app.id, val)}
+                                    />
+                                    {category.id === 'programming' && app.id === 'prog_other' && (
+                                        <div className="doodle-card p-4 mb-3 -mt-1 relative z-[1]">
+                                            <label className="doodle-label block mb-2">ระบุภาษาอื่นๆ</label>
+                                            <input
+                                                type="text"
+                                                className="doodle-input"
+                                                placeholder="เช่น R, PHP, Kotlin..."
+                                                value={catResponses.otherSpecify || ''}
+                                                onChange={(e) => handleOtherSpecifyChange(category.id, e.target.value)}
+                                            />
+                                        </div>
+                                    )}
+                                </React.Fragment>
                             ))}
 
-                            <div className="doodle-card p-4 mt-6 relative z-[1]">
-                                <label className="doodle-label block mb-2">
-                                    แอป/โปรแกรมอื่นๆ ในหมวดหมู่นี้ที่คุณเคยใช้
-                                </label>
-                                <textarea 
-                                    className="doodle-textarea doodle-textarea-field"
-                                    rows="3"
-                                    placeholder="ระบุชื่อโปรแกรม (ถ้ามี)..."
-                                    value={catResponses.otherText || ''}
-                                    onChange={(e) => handleOtherTextChange(category.id, e.target.value)}
-                                ></textarea>
-                            </div>
-                            
+                            {category.questionType !== 'know' && (
+                                <div className="doodle-card p-4 mt-6 relative z-[1]">
+                                    <label className="doodle-label block mb-2">
+                                        แอป/โปรแกรมอื่นๆ ในหมวดหมู่นี้ที่คุณเคยใช้
+                                    </label>
+                                    <textarea
+                                        className="doodle-textarea doodle-textarea-field"
+                                        rows="3"
+                                        placeholder="ระบุชื่อโปรแกรม (ถ้ามี)..."
+                                        value={catResponses.otherText || ''}
+                                        onChange={(e) => handleOtherTextChange(category.id, e.target.value)}
+                                    ></textarea>
+                                </div>
+                            )}
                         </div>
 
                         <div className="doodle-bottom-bar flex justify-center">

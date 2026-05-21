@@ -772,13 +772,12 @@
                     { id: 'gsheet', name: 'Google Sheet', slug: 'googlesheets' },
                     { id: 'gslide', name: 'Google Slide', slug: 'googleslides' },
                     { id: 'gdrive', name: 'Google Drive', slug: 'googledrive' },
-                    { id: 'gforms', name: 'Google Forms', slug: 'googleforms' },
                     { id: 'word', name: 'Microsoft Word', slug: 'microsoftword' },
                     { id: 'excel', name: 'Microsoft Excel', slug: 'microsoftexcel' },
                     { id: 'powerpoint', name: 'Microsoft PowerPoint', slug: 'microsoftpowerpoint' },
                     { id: 'onedrive', name: 'OneDrive', slug: 'microsoftonedrive' },
-                    { id: 'mforms', name: 'Microsoft Forms', slug: 'microsoftforms' },
-                    { id: 'coda', name: 'Coda', slug: 'coda' }
+                    { id: 'gtasks', name: 'Google Tasks', slug: 'googletasks' },
+                    { id: 'todo', name: 'Microsoft To Do', slug: 'microsofttodo' }
                 ]
             },
             {
@@ -796,13 +795,56 @@
             },
             {
                 id: 'tasks',
-                title: 'การจัดการงานและบันทึก (Tasks & Notes)',
+                title: 'การจัดการงาน บันทึก และการจัดการความรู้และข้อมูล (Tasks, Notes, KMs)',
                 apps: [
-                    { id: 'gtasks', name: 'Google Tasks', slug: 'googletasks' },
-                    { id: 'notebooklm', name: 'NotebookLM', slug: 'notebooklm' },
-                    { id: 'todo', name: 'Microsoft To Do', slug: 'microsofttodo' },
                     { id: 'onenote', name: 'OneNote', slug: 'microsoftonenote' },
-                    { id: 'obsidian', name: 'Obsidian', slug: 'obsidian' }
+                    { id: 'obsidian', name: 'Obsidian', slug: 'obsidian' },
+                    { id: 'coda', name: 'Coda', slug: 'coda' },
+                    { id: 'airtable', name: 'Airtable', slug: 'airtable' },
+                    { id: 'notion', name: 'Notion', slug: 'notion' },
+                    { id: 'xtile', name: 'Xtile', slug: 'xtile' },
+                    { id: 'appflowy', name: 'AppFlowy', slug: 'appflowy' },
+                    { id: 'affine', name: 'AFFiNE', slug: 'affine' },
+                    { id: 'raindrop', name: 'Raindrop', slug: 'raindropio' },
+                    { id: 'mymind', name: 'mymind', slug: 'mymind' },
+                    { id: 'fabric', name: 'Fabric', slug: 'fabric' },
+                    { id: 'capacities', name: 'Capacities', slug: 'capacities' },
+                    { id: 'slite', name: 'Slite', slug: 'slite' },
+                    { id: 'nuclino', name: 'Nuclino', slug: 'nuclino' },
+                    { id: 'basecamp', name: 'Basecamp', slug: 'basecamp' },
+                    { id: 'confluence', name: 'Confluence', slug: 'confluence' },
+                    { id: 'mem', name: 'Mem', slug: 'mem' },
+                    { id: 'tana', name: 'Tana', slug: 'tana' },
+                    { id: 'loop', name: 'Microsoft Loop', slug: 'microsoftloop' },
+                    { id: 'anytype', name: 'Anytype', slug: 'anytype' },
+                    { id: 'craft', name: 'Craft', slug: 'craftdocs' },
+                    { id: 'heptabase', name: 'Heptabase', slug: 'heptabase' },
+                    { id: 'fibery', name: 'Fibery', slug: 'fibery' },
+                    { id: 'docmost', name: 'Docmost', slug: 'docmost' },
+                    { id: 'walling', name: 'Walling', slug: 'walling' },
+                    { id: 'logseq', name: 'Logseq', slug: 'logseq' },
+                    { id: 'joplin', name: 'Joplin', slug: 'joplin' }
+                ]
+            },
+            {
+                id: 'productivity',
+                title: 'Productivity Tools',
+                apps: [
+                    { id: 'trello', name: 'Trello', slug: 'trello' },
+                    { id: 'asana', name: 'Asana', slug: 'asana' },
+                    { id: 'jira', name: 'Jira', slug: 'jira' },
+                    { id: 'monday', name: 'monday.com', slug: 'monday' },
+                    { id: 'clickup', name: 'ClickUp', slug: 'clickup' }
+                ]
+            },
+            {
+                id: 'alt_social',
+                title: 'Alternative Social Media',
+                apps: [
+                    { id: 'slack', name: 'Slack', slug: 'slack' },
+                    { id: 'discord', name: 'Discord', slug: 'discord' },
+                    { id: 'element', name: 'Element', slug: 'element' },
+                    { id: 'signal', name: 'Signal', slug: 'signal' }
                 ]
             },
             {
@@ -812,6 +854,7 @@
                     { id: 'gemini', name: 'Gemini', slug: 'googlegemini' },
                     { id: 'aistudio', name: 'Google AI Studio', slug: 'googleaistudio' },
                     { id: 'glabs', name: 'Google Labs', slug: 'googlelabs' },
+                    { id: 'notebooklm', name: 'NotebookLM', slug: 'notebooklm' },
                     { id: 'chatgpt', name: 'ChatGPT', slug: 'openai' },
                     { id: 'copilot', name: 'Microsoft Copilot', slug: 'microsoftcopilot' },
                     { id: 'claude', name: 'Claude AI', slug: 'anthropic' },
@@ -841,6 +884,8 @@
                 id: 'form_maker',
                 title: 'เครื่องมือสร้างฟอร์ม (Form Makers)',
                 apps: [
+                    { id: 'gforms', name: 'Google Forms', slug: 'googleforms' },
+                    { id: 'mforms', name: 'Microsoft Forms', slug: 'microsoftforms' },
                     { id: 'jotform', name: 'Jotform', slug: 'jotform' },
                     { id: 'tally', name: 'Tally Form', slug: 'tally' },
                     { id: 'surveymonkey', name: 'SurveyMonkey', slug: 'surveymonkey' }
@@ -896,7 +941,6 @@
                 id: 'business',
                 title: 'แพลตฟอร์มธุรกิจและฐานข้อมูล (Business & Data Platforms)',
                 apps: [
-                    { id: 'airtable', name: 'Airtable', slug: 'airtable' },
                     { id: 'odoo', name: 'Odoo', slug: 'odoo' }
                 ]
             },
@@ -931,8 +975,7 @@
                     { id: 'ts', name: 'TypeScript', slug: 'typescript' },
                     { id: 'sql', name: 'SQL', slug: 'mysql' },
                     { id: 'htmlcss', name: 'HTML and CSS', slug: 'html5' },
-                    { id: 'rust', name: 'Rust', slug: 'rust' },
-                    { id: 'prog_other', name: 'อื่นๆ (ระบุ)', slug: null }
+                    { id: 'rust', name: 'Rust', slug: 'rust' }
                 ]
             },
             {
@@ -977,7 +1020,21 @@
             skype: ICONIFY('skype'),
             people: FAVICON('people.live.com'),
             todo: FAVICON('to-do.microsoft.com'),
+            gtasks: FAVICON('tasks.google.com'),
             onenote: `${FABRIC}/onenote_48x1.svg`,
+            notebooklm: FAVICON('notebooklm.google.com'),
+            xtile: FAVICON('xtiles.app'),
+            mymind: FAVICON('mymind.com'),
+            fabric: FAVICON('fabric.so'),
+            mem: FAVICON('mem.ai'),
+            tana: FAVICON('tana.inc'),
+            loop: FAVICON('loop.microsoft.com'),
+            craft: FAVICON('craft.do'),
+            heptabase: FAVICON('heptabase.com'),
+            docmost: FAVICON('docmost.com'),
+            walling: FAVICON('walling.app'),
+            capacities: FAVICON('capacities.io'),
+            monday: FAVICON('monday.com'),
             gemini: ICONIFY('google-gemini'),
             aistudio: FAVICON('aistudio.google.com'),
             glabs: FAVICON('labs.google'),
@@ -1023,7 +1080,6 @@
             csharp: 'https://cdn.simpleicons.org/csharp',
             sql: 'https://cdn.simpleicons.org/mysql',
             htmlcss: 'https://cdn.simpleicons.org/html5',
-            prog_other: 'https://api.iconify.design/mdi/code-braces.svg'
         };
 
         /** Pastel bubble colors derived from site palette (coral, lavender, mint, yellow). */
@@ -1348,14 +1404,12 @@
                 });
 
                 const otherText = (catResp.otherText || '').trim();
-                const otherSpecify = (catResp.otherSpecify || '').trim();
                 if (isKnow) {
-                    if (knowItems.length || otherSpecify) {
+                    if (knowItems.length) {
                         byCategory.push({
                             title: cat.title.split(' (')[0],
                             isKnow: true,
-                            knowItems,
-                            otherSpecify
+                            knowItems
                         });
                     }
                 } else if (pro.length || basic.length || otherText) {
@@ -1408,11 +1462,6 @@
                                         {cat.knowItems.map((line) => (
                                             <div key={line} className="doodle-summary-extra text-sm">{line}</div>
                                         ))}
-                                        {cat.otherSpecify && (
-                                            <div className="doodle-summary-extra">
-                                                <span className="font-bold">ภาษาอื่นๆ:</span> {cat.otherSpecify}
-                                            </div>
-                                        )}
                                     </>
                                 ) : (
                                     <>
@@ -1513,6 +1562,17 @@
                 setStep(prev => prev + 1);
             };
 
+            const didMount = React.useRef(false);
+            React.useEffect(() => {
+                if (!didMount.current) {
+                    didMount.current = true;
+                    return;
+                }
+                if (direction === 'right') {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                }
+            }, [step, direction]);
+
             const handleBack = () => {
                 setDirection('left');
                 setStep(prev => prev - 1);
@@ -1548,9 +1608,6 @@
                     });
                     if (responses[cat.id]?.otherText) {
                         payload.responses[`Other: ${cat.title}`] = responses[cat.id].otherText;
-                    }
-                    if (responses[cat.id]?.otherSpecify) {
-                        payload.responses[`Other languages: ${cat.title}`] = responses[cat.id].otherSpecify;
                     }
                 });
 
@@ -1608,16 +1665,6 @@
                     [categoryId]: {
                         ...prev[categoryId],
                         otherText: text
-                    }
-                }));
-            };
-
-            const handleOtherSpecifyChange = (categoryId, text) => {
-                setResponses(prev => ({
-                    ...prev,
-                    [categoryId]: {
-                        ...prev[categoryId],
-                        otherSpecify: text
                     }
                 }));
             };
@@ -1701,26 +1748,13 @@
                                 </p>
                             )}
                             {category.apps.map(app => (
-                                <React.Fragment key={app.id}>
-                                    <AppCard
-                                        app={app}
-                                        value={catResponses[app.id]}
-                                        questionType={category.questionType}
-                                        onChange={(val) => handleAppChange(category.id, app.id, val)}
-                                    />
-                                    {category.id === 'programming' && app.id === 'prog_other' && (
-                                        <div className="doodle-card p-4 mb-3 -mt-1 relative z-[1]">
-                                            <label className="doodle-label block mb-2">ระบุภาษาอื่นๆ</label>
-                                            <input
-                                                type="text"
-                                                className="doodle-input"
-                                                placeholder="เช่น R, PHP, Kotlin..."
-                                                value={catResponses.otherSpecify || ''}
-                                                onChange={(e) => handleOtherSpecifyChange(category.id, e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-                                </React.Fragment>
+                                <AppCard
+                                    key={app.id}
+                                    app={app}
+                                    value={catResponses[app.id]}
+                                    questionType={category.questionType}
+                                    onChange={(val) => handleAppChange(category.id, app.id, val)}
+                                />
                             ))}
 
                             {category.questionType !== 'know' && (

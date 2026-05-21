@@ -297,6 +297,11 @@
             transform: rotate(-0.35deg);
         }
         .admin-header--minimal {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex-wrap: wrap;
             min-height: auto;
             padding: 0.35rem 0.5rem;
             margin-bottom: 0.5rem;
@@ -697,6 +702,10 @@
         @keyframes admin-pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.35; }
+        }
+        .admin-audio-btn {
+            font-size: 0.82rem;
+            padding: 0.35rem 0.75rem;
         }
 
         /* Portrait / narrow: stack sidebar above stage (survey stays mobile-first) */
@@ -1573,6 +1582,129 @@
             document.head.appendChild(scriptEl);
         });
 
+        const ADMIN_AUDIO_MUTE_KEY = 'stackq_admin_mute';
+        const ADMIN_SFX_NEW_SUBMISSION = 'assets/Sound Effect/bubble.mp3';
+
+        /** Looping ambient music (Web Audio) + new-submission SFX (bubble.mp3). */
+        const createAdminAudio = () => {
+            let ctx = null;
+            let musicGain = null;
+            let musicSource = null;
+            let submissionSfx = null;
+            let muted = localStorage.getItem(ADMIN_AUDIO_MUTE_KEY) === '1';
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const getCtx = () => {
+                if (!ctx) {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (!Ctx) return null;
+                    ctx = new Ctx();
+                    musicGain = ctx.createGain();
+                    musicGain.connect(ctx.destination);
+                    applyVolumes();
+                }
+                return ctx;
+            };
+
+            const getSubmissionSfx = () => {
+                if (!submissionSfx) {
+                    submissionSfx = new Audio(ADMIN_SFX_NEW_SUBMISSION);
+                    submissionSfx.preload = 'auto';
+                }
+                return submissionSfx;
+            };
+
+            const applyVolumes = () => {
+                if (!musicGain) return;
+                const off = muted || reducedMotion;
+                musicGain.gain.value = off ? 0 : 0.18;
+            };
+
+            const unlock = async () => {
+                const c = getCtx();
+                if (c && c.state === 'suspended') await c.resume();
+                getSubmissionSfx().load();
+                return !c || c.state === 'running';
+            };
+
+            const buildAmbientLoop = (c) => {
+                const loopSec = 16;
+                const sampleRate = c.sampleRate;
+                const length = Math.floor(sampleRate * loopSec);
+                const buffer = c.createBuffer(2, length, sampleRate);
+                const chord = [261.63, 329.63, 392, 523.25, 440, 349.23];
+                for (let ch = 0; ch < 2; ch++) {
+                    const data = buffer.getChannelData(ch);
+                    for (let i = 0; i < length; i++) {
+                        const t = i / sampleRate;
+                        let sample = 0;
+                        chord.forEach((freq, ni) => {
+                            const start = ni * 2.4;
+                            const dur = 2.1;
+                            if (t >= start && t < start + dur) {
+                                const local = t - start;
+                                const env = Math.sin((Math.PI * local) / dur);
+                                sample += Math.sin(2 * Math.PI * freq * local) * env * 0.07;
+                            }
+                        });
+                        data[i] = sample;
+                    }
+                }
+                return buffer;
+            };
+
+            const stopMusic = () => {
+                if (musicSource) {
+                    try { musicSource.stop(); } catch (_) { /* already stopped */ }
+                    try { musicSource.disconnect(); } catch (_) { /* ignore */ }
+                    musicSource = null;
+                }
+            };
+
+            const startMusic = () => {
+                if (muted || reducedMotion) return;
+                const c = getCtx();
+                if (!c) return;
+                stopMusic();
+                const buffer = buildAmbientLoop(c);
+                musicSource = c.createBufferSource();
+                musicSource.buffer = buffer;
+                musicSource.loop = true;
+                musicSource.connect(musicGain);
+                try {
+                    musicSource.start(0);
+                } catch (_) { /* ignore */ }
+            };
+
+            const playNewSubmission = () => {
+                if (muted || reducedMotion) return;
+                const base = getSubmissionSfx();
+                const clip = base.cloneNode();
+                clip.volume = 0.85;
+                clip.play().catch(() => { /* autoplay blocked until user gesture */ });
+            };
+
+            const setMuted = (next) => {
+                muted = next;
+                localStorage.setItem(ADMIN_AUDIO_MUTE_KEY, muted ? '1' : '0');
+                applyVolumes();
+                if (muted) stopMusic();
+                else startMusic();
+            };
+
+            return {
+                unlock,
+                startMusic,
+                stopMusic,
+                playNewSubmission,
+                setMuted,
+                isMuted: () => muted,
+                isMusicPlaying: () => !!musicSource
+            };
+        };
+
+        const adminAudio = createAdminAudio();
+
         const ADMIN_BUBBLE_TINTS = [
             'admin-logo-bubble--coral',
             'admin-logo-bubble--lavender',
@@ -1767,6 +1899,8 @@
                 try {
                     await fetchAdminSessions(ADMIN_PASSWORD);
                     sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+                    await adminAudio.unlock();
+                    adminAudio.startMusic();
                     onSuccess();
                 } catch (err) {
                     setError(
@@ -1819,10 +1953,23 @@
             const [selectedId, setSelectedId] = React.useState('');
             const [loading, setLoading] = React.useState(true);
             const [fetchError, setFetchError] = React.useState('');
+            const [audioMuted, setAudioMuted] = React.useState(adminAudio.isMuted());
+            const prevTotalSubmissionsRef = React.useRef(null);
 
             const load = React.useCallback(async () => {
                 try {
                     const data = await fetchAdminSessions(ADMIN_PASSWORD);
+                    const total =
+                        typeof data.totalSubmissions === 'number'
+                            ? data.totalSubmissions
+                            : (data.sessions || []).reduce(
+                                (n, s) => n + (s.submissions?.length || 0),
+                                0
+                            );
+                    if (prevTotalSubmissionsRef.current !== null && total > prevTotalSubmissionsRef.current) {
+                        adminAudio.playNewSubmission();
+                    }
+                    prevTotalSubmissionsRef.current = total;
                     setSessions(data.sessions || []);
                     setFetchError('');
                     setSelectedId((prev) => {
@@ -1842,6 +1989,27 @@
                 return () => clearInterval(id);
             }, [load]);
 
+            React.useEffect(() => {
+                adminAudio.unlock().then(() => {
+                    if (!adminAudio.isMuted() && !adminAudio.isMusicPlaying()) {
+                        adminAudio.startMusic();
+                    }
+                });
+            }, []);
+
+            const toggleAudio = async () => {
+                await adminAudio.unlock();
+                const next = !adminAudio.isMuted();
+                adminAudio.setMuted(next);
+                setAudioMuted(next);
+                if (!next) adminAudio.startMusic();
+            };
+
+            const handleLogout = () => {
+                adminAudio.stopMusic();
+                onLogout();
+            };
+
             const activeSession = sessions.find((s) => s.id === selectedId) || sessions[0];
             const bubbleItems = React.useMemo(
                 () => (activeSession ? aggregateSessionScores(activeSession.submissions) : []),
@@ -1852,7 +2020,15 @@
                 <div className="admin-page admin-page--dashboard relative z-[1]">
                     <DoodleDecorations />
                     <header className="admin-header admin-header--minimal">
-                        <button type="button" className="doodle-btn doodle-btn-ghost shrink-0 ml-auto" onClick={onLogout}>
+                        <button
+                            type="button"
+                            className="doodle-btn doodle-btn-ghost admin-audio-btn shrink-0"
+                            onClick={toggleAudio}
+                            aria-pressed={!audioMuted}
+                        >
+                            {audioMuted ? 'เปิดเสียง' : 'ปิดเสียง'}
+                        </button>
+                        <button type="button" className="doodle-btn doodle-btn-ghost shrink-0" onClick={handleLogout}>
                             ออกจากระบบ
                         </button>
                     </header>

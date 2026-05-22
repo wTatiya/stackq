@@ -1328,8 +1328,8 @@
 
         const categories = [
             {
-                id: 'docs',
-                title: 'เอกสารและพื้นที่จัดเก็บ (Documents & Storage)',
+                id: 'office',
+                title: 'เอกสาร การสื่อสาร และตารางงาน (Documents, Communication & Scheduling)',
                 apps: [
                     { id: 'gdoc', name: 'Google Doc', slug: 'googledocs' },
                     { id: 'gsheet', name: 'Google Sheet', slug: 'googlesheets' },
@@ -1339,26 +1339,16 @@
                     { id: 'excel', name: 'Microsoft Excel', slug: 'microsoftexcel' },
                     { id: 'powerpoint', name: 'Microsoft PowerPoint', slug: 'microsoftpowerpoint' },
                     { id: 'onedrive', name: 'OneDrive', slug: 'microsoftonedrive' },
-                    { id: 'gtasks', name: 'Google Tasks', slug: 'googletasks' },
-                    { id: 'todo', name: 'Microsoft To Do', slug: 'microsofttodo' }
-                ]
-            },
-            {
-                id: 'communication',
-                title: 'การสื่อสารและตารางเวลา (Communication & Scheduling)',
-                apps: [
                     { id: 'gmeet', name: 'Google Meet', slug: 'googlemeet' },
                     { id: 'gcalendar', name: 'Google Calendar', slug: 'googlecalendar' },
-                    { id: 'gcontacts', name: 'Google Contacts', slug: 'googlecontacts' },
                     { id: 'teams', name: 'Microsoft Teams', slug: 'microsoftteams' },
                     { id: 'outlook', name: 'Microsoft Outlook', slug: 'microsoftoutlook' },
-                    { id: 'skype', name: 'Skype', slug: 'skype' },
-                    { id: 'people', name: 'Microsoft People', slug: 'microsoftpeople' }
+                    { id: 'skype', name: 'Skype', slug: 'skype' }
                 ]
             },
             {
-                id: 'tasks',
-                title: 'การจัดการงาน บันทึก และการจัดการความรู้และข้อมูล (Tasks, Notes, KMs)',
+                id: 'work',
+                title: 'งาน บันทึก ความรู้ และการทำงานร่วมกัน (Work, Notes, Knowledge & Collaboration)',
                 apps: [
                     { id: 'onenote', name: 'OneNote', slug: 'microsoftonenote' },
                     { id: 'obsidian', name: 'Obsidian', slug: 'obsidian' },
@@ -1372,38 +1362,16 @@
                     { id: 'mymind', name: 'mymind', slug: 'mymind' },
                     { id: 'fabric', name: 'Fabric', slug: 'fabric' },
                     { id: 'capacities', name: 'Capacities', slug: 'capacities' },
-                    { id: 'slite', name: 'Slite', slug: 'slite' },
-                    { id: 'nuclino', name: 'Nuclino', slug: 'nuclino' },
-                    { id: 'basecamp', name: 'Basecamp', slug: 'basecamp' },
-                    { id: 'confluence', name: 'Confluence', slug: 'confluence' },
                     { id: 'mem', name: 'Mem', slug: 'mem' },
-                    { id: 'tana', name: 'Tana', slug: 'tana' },
                     { id: 'loop', name: 'Microsoft Loop', slug: 'microsoftloop' },
-                    { id: 'anytype', name: 'Anytype', slug: 'anytype' },
                     { id: 'craft', name: 'Craft', slug: 'craftdocs' },
-                    { id: 'heptabase', name: 'Heptabase', slug: 'heptabase' },
-                    { id: 'fibery', name: 'Fibery', slug: 'fibery' },
                     { id: 'docmost', name: 'Docmost', slug: 'docmost' },
                     { id: 'walling', name: 'Walling', slug: 'walling' },
-                    { id: 'logseq', name: 'Logseq', slug: 'logseq' },
-                    { id: 'joplin', name: 'Joplin', slug: 'joplin' }
-                ]
-            },
-            {
-                id: 'productivity',
-                title: 'Productivity Tools',
-                apps: [
                     { id: 'trello', name: 'Trello', slug: 'trello' },
                     { id: 'asana', name: 'Asana', slug: 'asana' },
                     { id: 'jira', name: 'Jira', slug: 'jira' },
                     { id: 'monday', name: 'monday.com', slug: 'monday' },
-                    { id: 'clickup', name: 'ClickUp', slug: 'clickup' }
-                ]
-            },
-            {
-                id: 'alt_social',
-                title: 'Alternative Social Media',
-                apps: [
+                    { id: 'clickup', name: 'ClickUp', slug: 'clickup' },
                     { id: 'slack', name: 'Slack', slug: 'slack' },
                     { id: 'discord', name: 'Discord', slug: 'discord' },
                     { id: 'element', name: 'Element', slug: 'element' },
@@ -1412,7 +1380,7 @@
             },
             {
                 id: 'ai',
-                title: 'ปัญญาประดิษฐ์ (AI Tools)',
+                title: 'ปัญญาประดิษฐ์ (AI Tools & Artifacts)',
                 apps: [
                     { id: 'gemini', name: 'Gemini', slug: 'googlegemini' },
                     { id: 'aistudio', name: 'Google AI Studio', slug: 'googleaistudio' },
@@ -1426,12 +1394,14 @@
                     { id: 'deepseek', name: 'Deepseek AI', slug: 'deepseek' },
                     { id: 'grok', name: 'Grok AI', slug: 'x' },
                     { id: 'kimi', name: 'Kimi AI', slug: 'moonshotai' },
-                    { id: 'okara', name: 'Okara AI', slug: 'okara' }
+                    { id: 'okara', name: 'Okara AI', slug: 'okara' },
+                    { id: 'gemini_gem', name: 'Gemini Gem / Opal', slug: 'googlegemini' },
+                    { id: 'claude_artifact', name: 'Claude Artifact', slug: 'anthropic' }
                 ]
             },
             {
                 id: 'design',
-                title: 'การออกแบบและวิเคราะห์ข้อมูล (Design & Analytics)',
+                title: 'ออกแบบ วิเคราะห์ข้อมูล และฟอร์ม (Design, Analytics & Forms)',
                 apps: [
                     { id: 'canva', name: 'Canva', slug: 'canva' },
                     { id: 'figma', name: 'Figma', slug: 'figma' },
@@ -1440,25 +1410,17 @@
                     { id: 'looker', name: 'Google Looker Studio', slug: 'looker' },
                     { id: 'ganalytics', name: 'Google Analytic', slug: 'googleanalytics' },
                     { id: 'sway', name: 'Microsoft Sway', slug: 'sway' },
-                    { id: 'clipchamp', name: 'Clipchamp', slug: 'clipchamp' }
-                ]
-            },
-            {
-                id: 'form_maker',
-                title: 'เครื่องมือสร้างฟอร์ม (Form Makers)',
-                apps: [
+                    { id: 'clipchamp', name: 'Clipchamp', slug: 'clipchamp' },
                     { id: 'gforms', name: 'Google Forms', slug: 'googleforms' },
                     { id: 'mforms', name: 'Microsoft Forms', slug: 'microsoftforms' },
                     { id: 'jotform', name: 'Jotform', slug: 'jotform' },
                     { id: 'tally', name: 'Tally Form', slug: 'tally' },
-                    { id: 'surveymonkey', name: 'SurveyMonkey', slug: 'surveymonkey' },
-                    { id: 'formbricks', name: 'Formbricks', slug: 'formbricks' },
-                    { id: 'limesurvey', name: 'LimeSurvey', slug: 'limesurvey' }
+                    { id: 'formbricks', name: 'Formbricks', slug: 'formbricks' }
                 ]
             },
             {
-                id: 'builders',
-                title: 'พัฒนาเว็บและอีคอมเมิร์ซ (Web Dev & E-commerce)',
+                id: 'build',
+                title: 'สร้างเว็บ แอป และแพลตฟอร์ม (Web, Apps & Business Platforms)',
                 apps: [
                     { id: 'gsite', name: 'Google Site', slug: 'googlesites' },
                     { id: 'wordpress', name: 'WordPress', slug: 'wordpress' },
@@ -1471,13 +1433,7 @@
                     { id: 'universe', name: 'Universe', slug: 'universe' },
                     { id: 'webex', name: 'Webex', slug: 'webex' },
                     { id: 'shopify', name: 'Shopify', slug: 'shopify' },
-                    { id: 'godaddy', name: 'GoDaddy', slug: 'godaddy' }
-                ]
-            },
-            {
-                id: 'nocode',
-                title: 'สร้างแอปแบบ No-Code (No-Code App Builders)',
-                apps: [
+                    { id: 'godaddy', name: 'GoDaddy', slug: 'godaddy' },
                     { id: 'replit', name: 'Replit', slug: 'replit' },
                     { id: 'lovable', name: 'Lovable', slug: 'lovable' },
                     { id: 'bolt', name: 'Bolt.new', slug: 'bolt' },
@@ -1489,23 +1445,8 @@
                     { id: 'sharetribe', name: 'Sharetribe', slug: 'sharetribe' },
                     { id: 'adalo', name: 'Adalo', slug: 'adalo' },
                     { id: 'base44', name: 'Base44', slug: 'base44' },
-                    { id: 'hostinger_horizon', name: 'Hostinger Horizon', slug: 'hostinger' },
                     { id: 'bubble', name: 'Bubble', slug: 'bubble' },
-                    { id: 'glide', name: 'Glide', slug: 'glide' }
-                ]
-            },
-            {
-                id: 'ai_artifacts',
-                title: 'แอป/อาร์ติแฟกต์ AI ขนาดเล็ก (AI Mini Apps & Artifacts)',
-                apps: [
-                    { id: 'gemini_gem', name: 'Gemini Gem / Opal', slug: 'googlegemini' },
-                    { id: 'claude_artifact', name: 'Claude Artifact', slug: 'anthropic' }
-                ]
-            },
-            {
-                id: 'business',
-                title: 'แพลตฟอร์มธุรกิจและฐานข้อมูล (Business & Data Platforms)',
-                apps: [
+                    { id: 'glide', name: 'Glide', slug: 'glide' },
                     { id: 'odoo', name: 'Odoo', slug: 'odoo' }
                 ]
             },
@@ -1531,8 +1472,8 @@
                 ]
             },
             {
-                id: 'browser',
-                title: 'Browser',
+                id: 'browser_security',
+                title: 'เบราว์เซอร์และความปลอดภัยไซเบอร์ (Browsers & Cybersecurity)',
                 apps: [
                     { id: 'edge', name: 'Microsoft Edge', slug: 'microsoftedge' },
                     { id: 'chrome', name: 'Google Chrome', slug: 'googlechrome' },
@@ -1548,13 +1489,7 @@
                     { id: 'floorp', name: 'Floorp', slug: 'floorp' },
                     { id: 'helium', name: 'Helium', slug: 'helium' },
                     { id: 'librewolf', name: 'LibreWolf', slug: 'librewolf' },
-                    { id: 'waterfox', name: 'Waterfox', slug: 'waterfox' }
-                ]
-            },
-            {
-                id: 'cybersecurity',
-                title: 'Cybersecurity',
-                apps: [
+                    { id: 'waterfox', name: 'Waterfox', slug: 'waterfox' },
                     { id: 'vpn', name: 'VPN (NordVPN, ExpressVPN, Mullvad, etc.)', slug: 'nordvpn' },
                     { id: 'gpass', name: 'Google Password Manager', slug: 'googlepasswordmanager' },
                     { id: 'mpass', name: 'Microsoft Password Manager', slug: 'microsoft' },
@@ -1579,16 +1514,6 @@
                     { id: 'sql', name: 'SQL', slug: 'mysql' },
                     { id: 'htmlcss', name: 'HTML and CSS', slug: 'html5' },
                     { id: 'rust', name: 'Rust', slug: 'rust' }
-                ]
-            },
-            {
-                id: 'others',
-                title: 'เครื่องมืออื่นๆ (Other Tools)',
-                apps: [
-                    { id: 'gfonts', name: 'Google Fonts', slug: 'googlefonts' },
-                    { id: 'producthunt', name: 'Product Hunt', slug: 'producthunt' },
-                    { id: 'unsplash', name: 'Unsplash', slug: 'unsplash' },
-                    { id: 'pexels', name: 'Pexels', slug: 'pexels' }
                 ]
             }
         ];
@@ -2407,13 +2332,9 @@
             mforms: `${FABRIC}/forms_48x1.svg`,
             gmeet: ICONIFY('google-meet'),
             gcalendar: ICONIFY('google-calendar'),
-            gcontacts: FAVICON('contacts.google.com'),
             teams: ICONIFY('microsoft-teams'),
             outlook: `${FABRIC}/outlook_48x1.svg`,
             skype: ICONIFY('skype'),
-            people: FAVICON('people.live.com'),
-            todo: FAVICON('to-do.microsoft.com'),
-            gtasks: FAVICON('tasks.google.com'),
             onenote: `${FABRIC}/onenote_48x1.svg`,
             notebooklm: FAVICON('notebooklm.google.com'),
             xtile: FAVICON('xtiles.app'),
@@ -2421,14 +2342,9 @@
             fabric: FAVICON('fabric.so'),
             appflowy: 'assets/logos/appflowy.png',
             raindrop: 'assets/logos/raindrop.png',
-            slite: 'assets/logos/slite.png',
-            nuclino: 'assets/logos/nuclino.png',
             mem: 'assets/logos/mem.png',
-            fibery: 'assets/logos/fibery.png',
-            tana: FAVICON('tana.inc'),
             loop: FAVICON('loop.microsoft.com'),
             craft: FAVICON('craft.do'),
-            heptabase: FAVICON('heptabase.com'),
             docmost: FAVICON('docmost.com'),
             walling: FAVICON('walling.app'),
             capacities: FAVICON('capacities.io'),
@@ -2444,7 +2360,6 @@
             okara: FAVICON('okara.ai'),
             jotform: FAVICON('jotform.com'),
             formbricks: 'assets/logos/formbricks.png',
-            limesurvey: 'assets/logos/limesurvey.png',
             tally: FAVICON('tally.so'),
             weweb: FAVICON('weweb.io'),
             replit: ICONIFY('replit-icon'),
@@ -2462,7 +2377,6 @@
             sharetribe: FAVICON('sharetribe.com'),
             adalo: FAVICON('adalo.com'),
             base44: FAVICON('base44.com'),
-            hostinger_horizon: 'assets/logos/hostinger_horizon.png',
             bubble: ICONIFY('bubble'),
             glide: FAVICON('glideapps.com'),
             gemini_gem: FAVICON('gemini.google.com'),
@@ -3360,21 +3274,20 @@
             const renderNameSelection = () => (
                 <div key="step-0" className={`doodle-page w-full max-w-md mx-auto px-4 py-6 sm:px-6 flex flex-col min-h-[100dvh] relative z-[1] ${direction === 'right' ? 'slide-enter-right' : 'slide-enter-left'}`}>
                     <DoodleDecorations />
-                    <div className="mt-8 sm:mt-12 flex-1 pb-36 sm:pb-32">
-                        <button
-                            type="button"
-                            className="doodle-icon-box doodle-icon-box--admin-trigger flex items-center justify-center mb-6"
-                            onClick={() => { window.location.hash = 'admin'; }}
-                            aria-label="เข้าสู่แดชบอร์ดผู้ดูแล"
-                            title="แดชบอร์ดผู้ดูแล"
-                        >
-                            <svg className="w-8 h-8" style={{ color: 'var(--ink)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                        </button>
-                        <h1 className="doodle-title doodle-title-playful text-xl sm:text-2xl uppercase mb-2 leading-tight">ยินดีต้อนรับ</h1>
-                        <p className="doodle-subtitle text-base mb-6 sm:mb-8 leading-relaxed">กรุณาเลือกชื่อของคุณเพื่อเริ่มแบบสำรวจ</p>
-                        
+                    <button
+                        type="button"
+                        className="doodle-icon-box doodle-icon-box--admin-trigger flex items-center justify-center mt-8 sm:mt-12 mb-6"
+                        onClick={() => { window.location.hash = 'admin'; }}
+                        aria-label="เข้าสู่แดชบอร์ดผู้ดูแล"
+                        title="แดชบอร์ดผู้ดูแล"
+                    >
+                        <svg className="w-8 h-8" style={{ color: 'var(--ink)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </button>
+                    <h1 className="doodle-title doodle-title-playful text-xl sm:text-2xl uppercase mb-2 leading-tight">ยินดีต้อนรับ</h1>
+                    <p className="doodle-subtitle text-base mb-6 sm:mb-8 leading-relaxed">กรุณาเลือกชื่อของคุณเพื่อเริ่มแบบสำรวจ หากไม่มีชื่อ ให้เลือก อื่นๆ ด้านล่างสุด</p>
+                    <div className="flex-1 pb-36 sm:pb-32">
                         <div className="doodle-input-wrap mb-4">
                             <DoodleSelect
                                 value={userName}

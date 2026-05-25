@@ -1580,39 +1580,54 @@
                 .sort((a, b) => b.score - a.score);
         };
 
-        /** JSONP avoids CORS — Google Apps Script does not send Access-Control-Allow-Origin to GitHub Pages. */
-        const fetchAdminSessions = (adminKey) => new Promise((resolve, reject) => {
-            const callbackName = `stackqAdmin_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-            const url = `${GOOGLE_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}&callback=${encodeURIComponent(callbackName)}`;
-            let scriptEl = null;
-            const cleanup = () => {
-                clearTimeout(timer);
-                try { delete window[callbackName]; } catch (_) { /* ignore */ }
-                if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
-            };
-            const timer = setTimeout(() => {
-                cleanup();
-                reject(new Error('หมดเวลาเชื่อมต่อ — ตรวจสอบการ Deploy Web App (Anyone) และโค้ด doGet'));
-            }, 20000);
+        /** Fetch admin sessions — tries fetch first, falls back to JSONP for environments that block CORS redirects. */
+        const fetchAdminSessions = async (adminKey) => {
+            const baseUrl = `${GOOGLE_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}`;
 
-            window[callbackName] = (data) => {
-                cleanup();
+            try {
+                const resp = await fetch(baseUrl, { redirect: 'follow' });
+                const data = await resp.json();
                 if (!data || !data.ok) {
-                    reject(new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ'));
-                    return;
+                    throw new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ');
                 }
-                resolve(data);
-            };
+                return data;
+            } catch (fetchErr) {
+                if (fetchErr.message === 'Unauthorized' || fetchErr.message === 'โหลดข้อมูลไม่สำเร็จ') throw fetchErr;
+            }
 
-            scriptEl = document.createElement('script');
-            scriptEl.src = url;
-            scriptEl.async = true;
-            scriptEl.onerror = () => {
-                cleanup();
-                reject(new Error('เชื่อมต่อไม่ได้ — ตั้งค่า Web App เป็น "Anyone" แล้ว Deploy เวอร์ชันใหม่'));
-            };
-            document.head.appendChild(scriptEl);
-        });
+            return new Promise((resolve, reject) => {
+                const callbackName = `stackqAdmin_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                const url = `${baseUrl}&callback=${encodeURIComponent(callbackName)}`;
+                let scriptEl = null;
+                const cleanup = () => {
+                    clearTimeout(timer);
+                    try { delete window[callbackName]; } catch (_) { /* ignore */ }
+                    if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+                };
+                const timer = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('หมดเวลาเชื่อมต่อ — ตรวจสอบการ Deploy Web App (Anyone) และโค้ด doGet'));
+                }, 20000);
+
+                window[callbackName] = (data) => {
+                    cleanup();
+                    if (!data || !data.ok) {
+                        reject(new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ'));
+                        return;
+                    }
+                    resolve(data);
+                };
+
+                scriptEl = document.createElement('script');
+                scriptEl.src = url;
+                scriptEl.async = true;
+                scriptEl.onerror = () => {
+                    cleanup();
+                    reject(new Error('เชื่อมต่อไม่ได้ — ตั้งค่า Web App เป็น "Anyone" แล้ว Deploy เวอร์ชันใหม่'));
+                };
+                document.head.appendChild(scriptEl);
+            });
+        };
 
         const ADMIN_AUDIO_MUTE_KEY = 'stackq_admin_mute';
         const ADMIN_BG_MUSIC = 'assets/Background Music/bg.mp3';

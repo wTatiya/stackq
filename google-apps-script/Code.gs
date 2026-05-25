@@ -92,7 +92,7 @@ function buildSessionsPayload_() {
 
   var headers = getHeaders_(sheet);
   var lastCol = headers.length;
-  var values = sheet.getRange(2, 1, lastRow, lastCol).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
   var submissions = [];
 
   values.forEach(function (row) {

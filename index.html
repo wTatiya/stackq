@@ -1580,53 +1580,27 @@
                 .sort((a, b) => b.score - a.score);
         };
 
-        /** Fetch admin sessions — tries fetch first, falls back to JSONP for environments that block CORS redirects. */
+        /** Fetch admin sessions via Google Apps Script web app. */
         const fetchAdminSessions = async (adminKey) => {
             const baseUrl = `${GOOGLE_SCRIPT_URL}?action=list&key=${encodeURIComponent(adminKey)}`;
 
-            try {
-                const resp = await fetch(baseUrl, { redirect: 'follow' });
-                const data = await resp.json();
-                if (!data || !data.ok) {
-                    throw new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ');
-                }
-                return data;
-            } catch (fetchErr) {
-                if (fetchErr.message === 'Unauthorized' || fetchErr.message === 'โหลดข้อมูลไม่สำเร็จ') throw fetchErr;
+            const resp = await fetch(baseUrl, {
+                method: 'GET',
+                redirect: 'follow',
+                credentials: 'omit',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            let data;
+            const text = await resp.text();
+            try { data = JSON.parse(text); } catch (_) {
+                throw new Error('ไม่สามารถอ่านข้อมูลจาก server ได้ (response ไม่ใช่ JSON)');
             }
 
-            return new Promise((resolve, reject) => {
-                const callbackName = `stackqAdmin_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-                const url = `${baseUrl}&callback=${encodeURIComponent(callbackName)}`;
-                let scriptEl = null;
-                const cleanup = () => {
-                    clearTimeout(timer);
-                    try { delete window[callbackName]; } catch (_) { /* ignore */ }
-                    if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
-                };
-                const timer = setTimeout(() => {
-                    cleanup();
-                    reject(new Error('หมดเวลาเชื่อมต่อ — ตรวจสอบการ Deploy Web App (Anyone) และโค้ด doGet'));
-                }, 20000);
-
-                window[callbackName] = (data) => {
-                    cleanup();
-                    if (!data || !data.ok) {
-                        reject(new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ'));
-                        return;
-                    }
-                    resolve(data);
-                };
-
-                scriptEl = document.createElement('script');
-                scriptEl.src = url;
-                scriptEl.async = true;
-                scriptEl.onerror = () => {
-                    cleanup();
-                    reject(new Error('เชื่อมต่อไม่ได้ — ตั้งค่า Web App เป็น "Anyone" แล้ว Deploy เวอร์ชันใหม่'));
-                };
-                document.head.appendChild(scriptEl);
-            });
+            if (!data || !data.ok) {
+                throw new Error((data && data.error) || 'โหลดข้อมูลไม่สำเร็จ');
+            }
+            return data;
         };
 
         const ADMIN_AUDIO_MUTE_KEY = 'stackq_admin_mute';
@@ -2120,10 +2094,11 @@
                     adminAudio.startMusic();
                     onSuccess();
                 } catch (err) {
+                    console.error('[StackQ Admin]', err);
                     setError(
                         err.message === 'Unauthorized'
                             ? 'รหัสผ่านไม่ถูกต้อง'
-                            : 'เชื่อมต่อไม่ได้ — ใน Apps Script: วางโค้ดจาก google-apps-script/Code.gs → Deploy → New version → ตั้ง Who has access เป็น Anyone'
+                            : `เชื่อมต่อไม่ได้ — ${err.message}`
                     );
                 } finally {
                     setChecking(false);
